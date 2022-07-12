@@ -150,24 +150,24 @@ section p {
     display: inline;
 }
 
-#p1card11, #cpcard1 {
+#p1card11, #dealercard1 {
     left: 0px;
     display: block;
 }
 
-#p1card12, #cpcard2 {
+#p1card12, #dealercard2 {
     left: 15px;
 }
 
-#p1card13, #cpcard3 {
+#p1card13, #dealercard3 {
     left: 30px;
 }
 
-#p1card14, #cpcard4 {
+#p1card14, #dealercard4 {
     left: 45px;
 }
 
-#p1card15, #cpcard5 {
+#p1card15, #dealercard5 {
     left: 60px;
 }
 
