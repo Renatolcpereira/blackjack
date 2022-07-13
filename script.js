@@ -13,6 +13,7 @@
     let totalUsedCards = 0;
     let removedCard = "";
     let id = null;
+    let playerTurn = true;
 
     // dealer vars
     let dealerTotalCards = 0;
@@ -65,17 +66,37 @@
 
     document.getElementById('pass').addEventListener('click', function (event) {
         event.preventDefault();
+        playerTurn = false;
         document.getElementById('control').style.display = "none";
-        setTimeout( dealerCardMoveFunc, 0);
-        setTimeout( calcScore, 600);
-        setTimeout( dealerCardMoveFunc, 1200);
-        setTimeout( calcScore, 1800);
-        setTimeout( dealerCardMoveFunc, 2400);
-        setTimeout( calcScore, 3000);
-        setTimeout( dealerCardMoveFunc, 3600);
-        setTimeout( calcScore, 4200);
-        setTimeout( dealerCardMoveFunc, 4800);
-        setTimeout( calcScore, 5400);
+        
+        if (!checkWinningCondition()) {
+            let id1 = null;
+            let id2 = null;
+            id1 = setTimeout( dealerCardMoveFunc, 0);
+            id2 = setTimeout( calcScore, 600);
+        }
+
+        if (!checkWinningCondition()) {
+            setTimeout ( function () {  
+                if (!checkWinningCondition()) {
+                    let id3 = null;
+                    let id4 = null;
+                    id3 = setTimeout( dealerCardMoveFunc, 0);
+                    id4 = setTimeout( calcScore, 600);
+                }
+            }, 1200);
+        }
+
+        if (!checkWinningCondition()) {
+            setTimeout ( function () {  
+                if (!checkWinningCondition()) {
+                    let id3 = null;
+                    let id4 = null;
+                    id3 = setTimeout( dealerCardMoveFunc, 0);
+                    id4 = setTimeout( calcScore, 600);
+                }
+            }, 2400);
+        }
     });
 
 
@@ -189,25 +210,48 @@
 
     // Function to check winning condition
     function checkWinningCondition() {
-        if (pl1Score === 21 || dealerScore > 21){
-            // Pl1 Wins
-            clearInterval(id);
-            document.querySelector('h2').innerHTML = `<a href="#" id="start">You WIN! Click to Start</a>`;
-            document.getElementById('start').addEventListener('click', function(event){
-                event.preventDefault();
-                location.reload();
-            });
-        } else if (pl1Score > 21 || dealerScore === 21) {
-            // Pl1 Blows
-            clearInterval(id);
-            document.querySelector('h2').innerHTML = `<a href="#" id="start">You LOST! Click to Start</a>`;
-            document.getElementById('start').addEventListener('click', function(event){
-                event.preventDefault();
-                location.reload();
-            });
-        };
+        let pl2wins = false;
+        let dealerWins = false;
 
+        if(pl1Score == 11 && pl1Cards.length == 2 && (Number(pl1Cards[0].slice(1, 3)) == 1 || Number(pl1Cards[1].slice(1, 3)) == 1) ) {
+            // Pl1 Wins
+            pl2wins = true;
+        }
+
+        if (pl1Score === 21 || dealerScore > 21 ) {
+             // Pl1 Wins
+             pl2wins = true;
+        }
+
+        if ( pl1Score > 21 || dealerScore === 21 || (dealerScore > pl1Score && !playerTurn) ) {
+            // Pl1 Blows
+            dealerWins = true;
+        }
         
+        if ( dealerScore == 11 && dealerCards.length == 2 && (Number(dealerCards[0].slice(1, 3)) == 1 || Number(dealerCards[1].slice(1, 3)) == 1) ) {
+            // Pl1 Blows
+            dealerWins = true;
+        }
+
+        if ( pl2wins ) {
+            document.getElementById('control').style.display = "none";
+            document.querySelector('h2').innerHTML = `<a href="#" id="start">Ganhou! Click para iniciar</a>`;
+            document.getElementById('start').addEventListener('click', function(event){
+                event.preventDefault();
+                location.reload();
+            });
+            return true;          
+        } else if ( dealerWins ) {
+            document.getElementById('control').style.display = "none";
+            document.querySelector('h2').innerHTML = `<a href="#" id="start">Perdeu! Click para iniciar</a>`;
+            document.getElementById('start').addEventListener('click', function(event){
+                event.preventDefault();
+                location.reload();
+            });
+            return true;
+        } else {
+            return false;
+        };
      };
      
 
