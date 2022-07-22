@@ -1,5 +1,11 @@
 * { box-sizing: border-box; }
 
+:root {
+    --boardWidth: 200px;
+    --totalBoards: 1;
+    --packWidth: 150px;
+  }
+
 body, h1, h2, h3, h4, ul, li, p {
     margin: 0;
     padding: 0;
@@ -17,7 +23,6 @@ img {
 body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: rgb(19, 144, 0);
-    height: 200px;
 }
 
 h1 {
@@ -27,45 +32,56 @@ h1 {
     margin-bottom: 20px;
 }
 
+
+#fichasbox {
+    margin-left: 15%;
+    width: 50px;
+    height: 50px;
+    float: left;
+}
+#fichasbox p {
+    text-align: center;
+    font-size: 14px;
+}
+
+#cash {
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+/* style for mensagemboard */
 #mensagemboard {
-    width: 400px;
-    height: 100px;
+    position: relative;
+    width: 50%;
+    height: 105px;
+    min-width: 430px;
     margin: auto;
 }
 
-section p {
-    margin: 0;
+#mensagemboard h2 {
+    text-align: center;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 25px;
-    font-weight: 600;
-    color: black;
-} 
-
-#mensagemboard h2 {
     font-size: 18px;
-    text-align: center;
-    float: left;
-    top: 50%;
-    margin-left: 20px;
-    -ms-transform: translatey(+50%);
-    transform: translatey(50%);
-    width: 250px;
-    padding: 10px 10px;
+    width: 220px;
+    padding: 10px 0;
     border-radius: 15px;
     border: 1px solid black;
 }
 
+
+/* style for playcardboard */
 #playcardsboard {
-    float: right;
     position: relative;
+    top: 50%;
+    left: 100%;
+    transform: translate(-100%, -50%);
     width: 100px;
     height: 100px;
     border-radius: 15px;
 }
-
 
 #playcardsboard div {
     position: absolute;
@@ -93,81 +109,113 @@ section p {
 }
 
 
-#playerboard, #dealerboard {
-    position: relative;
-    margin: auto;
-    width: 200px;
-    border: 1px solid black;
-    border-radius: 15px;
+/* style for dealerboard */
+.board p {
+    font-size: 25px;
+    font-weight: 600;
+    color: black;
 }
 
 #dealerboard {
-    height: 150px;
+    margin: auto;
+    border: 1px solid black;
+    text-align: center;
+    border-radius: 15px;
+    /* height: 150px; */
+    width: 200px;
 }
 
-#playerboard {
-    height: 200px;
+#dealerboard p {
+    padding: 52px 0;
 }
 
-.cardpack  {
+.cardpack {
+    position: relative;
+    margin: auto;
+    margin-top: 10px;
     display: none;
-    position: absolute;
-    left: calc((200px - 150px)/2);
-    width: 150px;
+    width: var(--packWidth);
     height: 85px;
-    top: 20px;
-}
-
-.cardpack div {
-    position: absolute;
-    height: 85px;
-    width: 57px;
-    border: 0.5px solid black;
 }
 
 .score {
-    position: absolute;
     display: none;
     text-align: center;
-    border: 0;
-    top: 120px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     font-size: 16px;
     width: 100%;
 }
 
-#control {
-    display: none;
-    position: absolute;
-    text-align: center;
-    border: 0;
-    top: 150px;
-    height: 30px;
-    left: 0;
+
+/* style for player board */
+#playerboard {
+    position: relative;
     width: 100%;
+    margin: auto;
+    text-align: center;
+    border-radius: 15px;
 }
 
-#control button {
-    display: inline;
+#playerboard p {
+    padding: 69.5px 0;
 }
 
-#p1card11, #dealercard1 {
-    left: 0px;
+#playerContent, #player1AContent, #player1BContent {
+    margin: auto;
+    text-align: center;
+    position: absolute;
+    border: 1px solid black;
+    border-radius: 15px;
+    height: 170px;
+    left: 50%;
+    transform: translatex(-50%);
+    width: var(--boardWidth);
     display: block;
 }
 
-#p1card12, #dealercard2 {
-    left: 15px;
+#playerContent {
+    display: block;
 }
 
-#p1card13, #dealercard3 {
-    left: 30px;
+#player1AContent {
+    display: none;
 }
 
-#p1card14, #dealercard4 {
-    left: 45px;
+#player1BContent {
+    display: none;
 }
 
-#p1card15, #dealercard5 {
-    left: 60px;
+.cardpack div {
+    background-color: blue;
+    position: absolute;
+    height: 85px;
+    width: 57.5px;
+    border: 0.5px solid black;
+}
+
+.control {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    width: 100%;
+    height: 20px;
+}
+
+.control button {
+    display: inline;
+    font-size: 10px;
+}
+
+#btn1Asplit {
+    display: none;
+}
+
+#player1AControl {
+    display: block;
+}
+
+#player1BControl {
+    display: block;
 }
 
