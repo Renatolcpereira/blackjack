@@ -2,23 +2,19 @@
     'use strict';
 
     // Array cartas do baralho
-    /* let allCards = ["p01","p02","p03","p04","p05","p06","p07","p08","p09","p10","p11","p12","p13", 
+    let allCards = ["p01","p02","p03","p04","p05","p06","p07","p08","p09","p10","p11","p12","p13", 
                      "e01","e02","e03","e04","e05","e06","e07","e08","e09","e10","e11","e12","e13", 
                      "c01","c02","c03","c04","c05","c06","c07","c08","c09","c10","c11","c12","c13", 
-                     "o01","o02","o03","o04","o05","o06","o07","o08","o09","o10","o11","o12","o13"] */
+                     "o01","o02","o03","o04","o05","o06","o07","o08","o09","o10","o11","o12","o13"]
 
-    let allCards = ["p01","p02","p07","p08","p09","p10","p11","p12","p13", 
-                     "e01","e02","e07","e08","e09","e10","e11","e12","e13", 
-                     "c01","c02","c07","c08","c09","c10","c11","c12","c13", 
-                     "o01","o02","o07","o08","o09","o10","o11","o12","o13"]
     let gameControl = {
-        pack1: { player: "player1A", packposX: "0px", packposY: "0px", points1: 0, points2: 0, winCondition: null, 
+        pack1: { player: "player1A", bet: 0, packposX: 0, packposY: 0, points1: 0, points2: 0, winCondition: null, 
             cards: { 
                 /* card1: { card: "p01", reveal: true },
                 card2: { card: "e07", reveal: true },
                 card3: { card: "c12", reveal: true } */
             } },
-        pack2: { player: "player1B", packposX: "0px", packposY: "0px", points1: 0, points2: 0, winCondition: null, 
+        pack2: { player: "player1B", bet: 0, packposX: 0, packposY: 0, points1: 0, points2: 0, winCondition: null, 
             cards: { 
                 /* card1: { card: "p01", reveal: true },
                 card2: { card: "e07", reveal: true },
@@ -144,10 +140,10 @@
     function switchPlayer (player) {
         if ( totalPlayers == 2 ) { 
             if ( player == "player1A" && !player1APass) {
-                $('#player1AContent').css("background-color", "rgb(23, 171, 0)");
+                $('#player1AContent').css("background-color", "#337207");
                 $('#btn1Acontinue').css("display","inline");
                 $('#btn1Apass').css("display","inline");
-                $('#player1BContent').css("background-color", "rgb(19, 144, 0)");
+                $('#player1BContent').css("background-color", "transparent");
                 if ( packs[1].winCondition != null ) {
                     $('#btn1Bcontinue').css("display","none");
                     $('#btn1Bpass').css("display","none");
@@ -159,10 +155,10 @@
                 console.log(packs[0].cards);
                 console.log("-----------------");
             } else if ( player == "player1B" && !player1BPass ) {
-                $('#player1BContent').css("background-color", "rgb(23, 171, 0)");
+                $('#player1BContent').css("background-color", "#337207");
                 $('#btn1Bcontinue').css("display","inline");
                 $('#btn1Bpass').css("display","inline");
-                $('#player1AContent').css("background-color", "rgb(19, 144, 0)");
+                $('#player1AContent').css("background-color", "transparent");
                 if ( packs[0].winCondition != null ) {
                     $('#btn1Acontinue').css("display","none");
                     $('#btn1Apass').css("display","none");
@@ -174,8 +170,8 @@
                 console.log(packs[1].cards);
                 console.log("-----------------");
             } else if ( player == "dealer") {
-                $('#player1BContent').css("background-color", "rgb(19, 144, 0)");
-                $('#player1AContent').css("background-color", "rgb(19, 144, 0)");
+                $('#player1BContent').css("background-color", "#337207");
+                $('#player1AContent').css("background-color", "#337207");
                 $('#btn1Acontinue').css("display","none");
                 $('#btn1Apass').css("display","none");
                 $('#btn1Bcontinue').css("display","none");
