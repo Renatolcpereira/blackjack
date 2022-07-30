@@ -19,167 +19,237 @@
                 /* card1: { card: "p01", reveal: true },
                 card2: { card: "e07", reveal: true },
                 card3: { card: "c12", reveal: true } */
-            } },
+            } }
     };
 
     let packs = Object.values(gameControl);
-    const totalcards = (allCards.length);
     let removedCard = "";
     let playerTurn = "player1A";
-    let dealerTurn = false;
     let totalPlayers = 1;
-    let firstTime = true; // var to avoid infinite loop inside checkWinningCondition funtioc
+    let firstTime = true; // var to avoid infinite loop inside checkWinningCondition funct
+    let playerCoins = 1000;
+    let playBoardWidth = $('#playerboard').width();
+    let endGameVar = false;
+    let shiftCondtion = null;
 
     // dealer vars
     let dealerTotalCards = 0;
-    const dealerCards = {card1: { card: "",reveal: false }, card2: { card: "",reveal: false }};
+    let dealerCards = {card1: { card: "",reveal: false }, card2: { card: "",reveal: false }};
     let dealerCardPosX = 0;
     let dealerCardPosY = 0;
     let dealerScore = [ 0 , 0 ];
-    let dealerWins = null;
+    let dealerWins = [ null, null ];
+    let dlPoints = 0;
 
     // Player vars
     let plTotalCards = 0;
     let player1APass = false;
     let player1BPass = false;
+    let pl1point = 0;
+    let pl2point = 0;
+    let bet1A = 0;
+    let bet1B = 0;
 
     // Cards vars
-    const cardsPack = $('#playcardsboard');
     let cardsPosX = 0;
     let cardsPosY = 0;
 
-    shuffleCards();
-    
-    // Start Button click event
-    $(window).one('click', function (event) {
-        event.preventDefault();
-        $('section p').remove();
-        $('#playerContent').remove();
-        $('#dealerpack').css( "display", "block" );
-        $('#dealerscore').css( "display", "block" );
-        $('.cardpack').css( "display", "block" );
-        $('.score').css( "display", "block");
+    playRoll(false);
 
-        $('#playerboard').css({"border": "0", "width": "100%"});
-        $('#player1AContent').css( "display", "block" );
+    function playRoll(startroll) {
+        if (startroll) {
+            allCards = ["p01","p02","p03","p04","p05","p06","p07","p08","p09","p10","p11","p12","p13", 
+                        "e01","e02","e03","e04","e05","e06","e07","e08","e09","e10","e11","e12","e13", 
+                        "c01","c02","c03","c04","c05","c06","c07","c08","c09","c10","c11","c12","c13", 
+                        "o01","o02","o03","o04","o05","o06","o07","o08","o09","o10","o11","o12","o13"];
+            gameControl = {
+            pack1: { player: "player1A", bet: 0, packposX: 0, packposY: 0, points1: 0, points2: 0, winCondition: null, 
+                cards: { } },
+            pack2: { player: "player1B", bet: 0, packposX: 0, packposY: 0, points1: 0, points2: 0, winCondition: null, 
+                cards: { } } 
+            };
+            packs = Object.values(gameControl)
+            removedCard = "";
+            playerTurn = "player1A";
+            totalPlayers = 1;
+            firstTime = true;
+            dealerTotalCards = 0;
+            dealerCards = {card1: { card: "",reveal: false }, card2: { card: "",reveal: false }};
+            dealerScore = [ 0 , 0 ];
+            dealerWins = [ null, null ];
+            bet1A = 0;
+            bet1B = 0;
+            plTotalCards = 0;
+            player1APass = false;
+            player1BPass = false;
+            pl1point = 0;
+            pl2point = 0;
+            dlPoints = 0;
+            playBoardWidth = $('#playerboard').width();
+            $('#player1BContent').animate({ left: `50%` }, 500, 'swing', function () {
+                $('#player1BContent').css( "display" , "none" ); 
+            } );
+            $('#bet1B').animate({ left: `50%` }, 500, 'swing', function () {
+                $('#bet1B').css( "display" , "none" );
+            } );
+            $('#bet1A').animate({ left: `50%` }, 550, 'swing' );
+            $('#player1AContent').animate({ left: `50%` }, 550, 'swing', getBoardsPositions );
+            $('#player1Apack').html('');
+            $('#dealerpack').html('');
+            $('#player1Bpack').html('');
+            $('#player1AScore').html('<strong>0 pontos</strong>');
+            $('#player1BScore').html('<strong>0 pontos</strong>');
+            $('#dealerscore').html('<strong>0 pontos</strong>');
+            $('#bet1A').html("$0");
+            $('#bet1B').html("$0");
+            $('#btn1Acontinue').off();
+            $('#btn1Bcontinue').off();
+            $('#btn1Apass').off();
+            $('#btn1Bpass').off();
+            $('#player1AContent').off();
+            $('#player1BContent').off();
+            $('#btn1Acontinue').css( "display" , "inline-block" );
+            $('#btn1Bcontinue').css( "display" , "inline-block" );
+            $('#btn1Apass').css( "display" , "inline-block" );
+            $('#btn1Bpass').css( "display" , "inline-block" );
+            $('#player1AContent').css("background-color", "transparent");
+            $('#player1BContent').css("background-color", "transparent");
+
+        };
+
+        shuffleCards();
+        $('#cash').html(`$${playerCoins}`);
+
+        // Start Button click event
+        $(window).one('click', function (event) {
+            event.preventDefault();
+            $('#dealerboard p').remove();
+            $('#playerContent p').remove();
+            $('#playerContent').remove();
+            $('#dealerpack').css( "display", "block" );
+            $('#dealerscore').css( "display", "block" );
+            $('.cardpack').css( "display", "block" );
+            $('.score').css( "display", "block");
+
+            $('#playerboard').css({"border": "0", "width": "100%"});
+            $('#player1AContent').css( "display", "block" );
+            
+            $('#player1AControl').css( "display", "block" );
+            $('h2').html("Boa sorte !");
+
+            packs[0].bet = 50;
+            playerCoins -= packs[0].bet;
+            $('#bet1A').html(`$${packs[0].bet}`);
+            $('#cash').html(`$${playerCoins}`);
+
+            getBoardsPositions();
+            dealerCardFunc(true, function () { dealerCardFunc(false); });
+            playerCardFunc(true, function () { playerCardFunc(true);  });
+            setTimeout( checkSplit, 1000, true); 
+        });
+
+        // Player 1A - Continue Buttom
+        $('#btn1Acontinue').on('click', function (event) {
+            event.preventDefault();
+            $('#btn1Asplit').css( "display", "none" );
+            switchPlayer("player1A");
+            playerCardFunc(true);
+        });
         
-        $('.control').css( "display", "block" );
-        $('h2').html("Boa sorte !");
+        // Player 1B clicked Continue
+        $('#btn1Bcontinue').on('click', function (event) {
+            event.preventDefault();
+            playerTurn = true;
+            switchPlayer("player1B");
+            playerCardFunc(true);
+        });
 
-        getBoardsPositions();
-        dealerCardFunc(true, function () { dealerCardFunc(false); });
-        playerCardFunc(true, function () { playerCardFunc(true);  });
-        setTimeout( checkSplit, 1000, true); 
-    });
+        // Player 1A - Pass Buttom
+        $('#btn1Apass').on('click', function (event) {
+            event.preventDefault();
+            if ( totalPlayers == 1) {
+                dealerTurnFunc();
+            } else {
+                if ( !player1BPass ) {
+                    player1APass = true;
+                    $('#btn1Acontinue').css("display","none");
+                    $('#btn1Apass').css("display","none");
+                    $('#player1AControl').css("display","none");
+                    $('#player1AContent').off();
+                    switchPlayer("player1B");
+                } else {
+                    dealerTurnFunc();
+                }
+            }
+        });
 
-    // Player 1A - Continue Buttom
-    $('#btn1Acontinue').on('click', function (event) {
-        event.preventDefault();
-        $('#btn1Asplit').css( "display", "none" );
-        switchPlayer("player1A");
-        playerCardFunc(true);
-    });
-    
-    // Player 1B clicked Continue
-    $('#btn1Bcontinue').on('click', function (event) {
-        event.preventDefault();
-        playerTurn = true;
-        switchPlayer("player1B");
-        playerCardFunc(true);
-    });
-
-    // Player 1A - Pass Buttom
-    $('#btn1Apass').on('click', function (event) {
-        event.preventDefault();
-        if ( totalPlayers == 1) {
-            dealerTurnFunc();
-        } else {
-            if ( !player1BPass ) {
-                player1APass = true;
-                $('#btn1Acontinue').css("display","none");
-                $('#btn1Apass').css("display","none");
-                $('#player1AControl').html("<p>Aguarde</p>");
-                $('#player1AContent').off();
-                switchPlayer("player1B");
+        // Player 1B - Pass Buttom
+        $('#btn1Bpass').on('click', function (event) {
+            event.preventDefault();
+            if ( !player1APass) {
+                player1BPass = true;
+                $('#btn1Bcontinue').css("display","none");
+                $('#btn1Bpass').css("display","none");
+                $('#player1BControl').css("display","none");
+                $('#player1BContent').off();
+                switchPlayer("player1A");
             } else {
                 dealerTurnFunc();
             }
-        }
-    });
+        });
 
-     // Player 1B - Pass Buttom
-     $('#btn1Bpass').on('click', function (event) {
-        event.preventDefault();
-        if ( !player1APass) {
-            player1BPass = true;
-            $('#btn1Bcontinue').css("display","none");
-            $('#btn1Bpass').css("display","none");
-            $('#player1BControl').html("<p>Aguarde</p>");
-            $('#player1BContent').off();
-            switchPlayer("player1A");
-        } else {
-            dealerTurnFunc();
-        }
-    });
+        // Player 1A - Switch
+        $('#player1AContent').on('click', "#player1Apack", function(){ 
+            if ( packs[0].winCondition == null ) {
+                switchPlayer("player1A"); 
+            }
+        });
 
-    // Player 1A - Switch
-    $('#player1AContent').on('click', "#player1Apack", function(){ 
-        if ( packs[0].winCondition == null ) {
-            switchPlayer("player1A"); 
-        }
-    });
-
-    // Player 1B - Switch
-    $('#player1BContent').on('click', "#player1Bpack", function(){ 
-        if ( packs[1].winCondition == null ) {
-            switchPlayer("player1B"); 
-        } 
-    });
+        // Player 1B - Switch
+        $('#player1BContent').on('click', "#player1Bpack", function(){ 
+            if ( packs[1].winCondition == null ) {
+                switchPlayer("player1B"); 
+            } 
+        });
+    };
 
     // Function to switch playerContent
     function switchPlayer (player) {
-        if ( totalPlayers == 2 ) { 
-            if ( player == "player1A" && !player1APass) {
-                $('#player1AContent').css("background-color", "#337207");
-                $('#btn1Acontinue').css("display","inline");
-                $('#btn1Apass').css("display","inline");
-                $('#player1BContent').css("background-color", "transparent");
-                if ( packs[1].winCondition != null ) {
-                    $('#btn1Bcontinue').css("display","none");
-                    $('#btn1Bpass').css("display","none");
-                    $('#player1BControl').html("<p>Aguarde</p>");
-                    $('#player1BContent').off();
-                }
-                playerTurn = "player1A";
-                console.log("Mudança de player de B -> A");
-                console.log(packs[0].cards);
-                console.log("-----------------");
-            } else if ( player == "player1B" && !player1BPass ) {
-                $('#player1BContent').css("background-color", "#337207");
-                $('#btn1Bcontinue').css("display","inline");
-                $('#btn1Bpass').css("display","inline");
-                $('#player1AContent').css("background-color", "transparent");
-                if ( packs[0].winCondition != null ) {
-                    $('#btn1Acontinue').css("display","none");
-                    $('#btn1Apass').css("display","none");
-                    $('#player1AControl').html("<p>Aguarde</p>");
-                    $('#player1AContent').off();
-                }
-                playerTurn = "player1B";
-                console.log("Mudança de player de A -> B");
-                console.log(packs[1].cards);
-                console.log("-----------------");
-            } else if ( player == "dealer") {
-                $('#player1BContent').css("background-color", "#337207");
-                $('#player1AContent').css("background-color", "#337207");
-                $('#btn1Acontinue').css("display","none");
-                $('#btn1Apass').css("display","none");
-                $('#btn1Bcontinue').css("display","none");
-                $('#btn1Bpass').css("display","none");
-                $('#btn1Asplit').css( "display", "none" );
-                $('#player1AControl').html("<p>Aguarde</p>");
-                $('#player1BControl').html("<p>Aguarde</p>");
+        if ( totalPlayers ==2 && player == "player1A" && !player1APass) {
+            $('#player1AContent').css("background-color", "#337207");
+            $('#player1AControl').css("display","block");
+            $('#player1BContent').css("background-color", "transparent");
+            $('#player1BControl').css("display","none");
+            if ( packs[1].winCondition != null ) {
+                $('#player1BContent').off();
             }
+            playerTurn = "player1A";
+            console.log("Mudança de player de B -> A");
+            console.log(packs[0].cards);
+            console.log("-----------------");
+        } 
+        if ( totalPlayers ==2 && player == "player1B" && !player1BPass ) {
+            $('#player1BContent').css("background-color", "#337207");
+            $('#player1BControl').css("display","block");
+            $('#player1AContent').css("background-color", "transparent");
+            $('#player1AControl').css("display","none");
+            if ( packs[0].winCondition != null ) { 
+                $('#player1AContent').off();
+            }
+            playerTurn = "player1B";
+            console.log("Mudança de player de A -> B");
+            console.log(packs[1].cards);
+            console.log("-----------------");
+        }
+        if ( player == "dealer") {
+            $('#player1BContent').css("background-color", "#transparent");
+            $('#player1AContent').css("background-color", "#transparent");
+            $('#player1AControl').css("display","none");
+            $('#player1BControl').css("display","none");
+            playerTurn = "dealer";
+            console.log("Mudança para o Croupie");
+            console.log(dealerCards);
+            console.log("-----------------");
         }
     };
 
@@ -191,8 +261,8 @@
         packs[1].packposY = Math.round($(`#player1Bpack`).offset().top);
         dealerCardPosX = Math.round($('#dealerpack').offset().left);
         dealerCardPosY = Math.round($('#dealerpack').offset().top);
-        cardsPosX = Math.round(cardsPack.offset().left);
-        cardsPosY = Math.round(cardsPack.offset().top) + 7;
+        cardsPosX = Math.round($('#playcardsboard').offset().left);
+        cardsPosY = Math.round($('#playcardsboard').offset().top) + 7;
         console.log(`Player1A X - ${packs[0].packposX} / Y - ${packs[0].packposY}`);
         console.log(`Player1B X - ${packs[1].packposX} / Y - ${packs[1].packposY}`);
         console.log(`Dealer X - ${dealerCardPosX} / Y - ${dealerCardPosY}`);
@@ -202,7 +272,7 @@
     // Function shuffle cards
     function shuffleCards () {
         let tempArr = [];
-        for ( let i = 0; i < totalcards - 1; i++ ) {
+        for ( let i = 0; i < allCards.length - 1; i++ ) {
             tempArr.push(allCards.splice(Math.floor(Math.random()*allCards.length),1)[0]);
         }
         tempArr.push(allCards[0]); 
@@ -228,6 +298,7 @@
         for (let i = 0; i < totalPlayers ; i++) {
             if ( packs[i].player === playerTurn ){
                 console.log(`+ Carta para ${packs[i].player} - ${removedCard}`);
+                console.log(`Total Players: ${totalPlayers}`);
                 cardsArray = Object.entries(packs[i].cards);
                 console.log(cardsArray);
                 plTotalCards = cardsArray.length;
@@ -253,35 +324,47 @@
     };
 
     // Function to add one card to dealer
-    function dealerTurnFunc() { 
-        dealerTurn = true;
+    function dealerTurnFunc() {
         switchPlayer("dealer");
         console.log("******* Looping do Dealer **********");
+        endGameVar = false;
 
         dealerCards.card2.reveal = true;
         $(`#dealercard12`).html(`<img src="img/${dealerCards.card2.card}.jpg">`);
         calcScore();
         
-        if (!checkWinningCondition()) {
-            let id = null;
-            id = setTimeout( dealerCardFunc (true), 0);
-        }
-        let t = 1 ;
-        // add cards to dealer till end game
-        let cicle = setInterval( () => {
-            if (!checkWinningCondition() && t < 5) {
-                let id = null;
-                id = setTimeout( dealerCardFunc (true), 0);
-                t++;
-                if ( t == 5) {console.log("limite de cartas atingido"); };
+        if (!endGameVar) {
+            setTimeout( dealerCardFunc (true), 0);
+            if (!endGameVar) {
+                let t = 1 ;
+                // add cards to dealer till end game
+                let cicle = setInterval( () => {
+                    if (!endGameVar && t < 5) {
+                        let id = null;
+                        id = setTimeout( dealerCardFunc (true), 500 * (t - 1));
+                        t++;
+                        if ( t == 5) {console.log("limite de cartas atingido"); console.log("FFFIIIMMMM por limite"); };
+                    } else {
+                        clearInterval(cicle);
+                        console.log("FFFFFFFIIIIIIIMMMMMMM");
+                        endGame();
+                    }
+                }, 1200);
             } else {
-                clearInterval(cicle);
-            }
-        }, 1200);
+                console.log("FFFFFFFIIIIIIIMMMMMMM");
+                endGame();
+            } 
+        } else {
+            console.log("FFFFFFFIIIIIIIMMMMMMM");
+            endGame();
+        }
+
+           
     };
 
     // Function to calc score
     function calcScore () {
+        console.log("----- Calculando Score -------");
         let temp = 0;
         let cardsArray = Object.entries(packs[0].cards);
 
@@ -336,16 +419,7 @@
                 }
             }
         }
-        checkWinningCondition(); 
-    };
 
-    // Function to check winning condition
-    function checkWinningCondition() {
-        let dlPoints = 0;
-        let pl1point = 0;
-        let pl2point = 0;
-
-        // check points
         if ( dealerScore[0] == 21 || dealerScore[1] == 21 ) { dlPoints = 21;}
         else if ( dealerScore[1] > 21 ) { dlPoints = dealerScore[0];}
         else { dlPoints = dealerScore[1];}
@@ -358,126 +432,160 @@
         else if ( packs[1].points2 > 21 ) { pl2point = packs[1].points1; } 
         else { pl2point = packs[1].points2; }
 
+        shiftCondtion = null;
         // check player1A
-        if ( playerTurn == "player1A" && packs[0].winCondition == null ) { rules (0, pl1point); }
+        if ( playerTurn == "player1A" && packs[0].winCondition == null ) {
+            shiftCondtion = rules (0, pl1point); 
+            if ( shiftCondtion && totalPlayers == 2 && !player1BPass) {
+                player1APass = true; 
+                switchPlayer("player1B");
+                return;
+            }
+        }
+
         // check player1B
-        if ( playerTurn == "player1B" && packs[1].winCondition == null ) { rules (1, pl2point); }
+        if ( playerTurn == "player1B" && packs[1].winCondition == null ) {
+            shiftCondtion = rules (1, pl2point); 
+            if ( shiftCondtion && totalPlayers == 2 && !player1APass) {
+                player1BPass = true; 
+                switchPlayer("player1A");
+                return;
+            }
+        }
 
-        if ( dealerTurn ) {
+        // check dealer
+        if ( playerTurn == "dealer" ) {
             rules (0, pl1point);
-            rules (1, pl2point);
-            if ( dlPoints == pl1point ) { packs[0].winCondition = "deuce" };
-            if ( dlPoints == pl2point ) { packs[1].winCondition = "deuce" };
-        }
+            if ( totalPlayers == 2) { 
+                rules (1, pl2point); 
+            };
+        }           
 
-        function rules (i , plPoints) {
-            console.log(`rodando - rules ${i}`);
-            if ( plPoints == 21 && dlPoints != 21) { packs[i].winCondition = true; }
-            else if ( plPoints == 21 && dlPoints == 21) { packs[i].winCondition = "deuce"; }
-            else if ( plPoints > 21 ) { packs[i].winCondition = false; }
-
-            if ( dealerTurn ) {
-                if ( plPoints != 21 && dlPoints == 21) { packs[i].winCondition = false; dealerWins = true; }
-                if ( plPoints < 21 && dlPoints < 21 && plPoints < dlPoints  ) { packs[i].winCondition = false; dealerWins = true; }
-                if ( dlPoints > 21 ) { packs[i].winCondition = true; dealerWins = false;}
-                if ( plPoints == dlPoints ) { packs[i].winCondition = "deuce"; dealerWins = "deuce";}
+        // check end of Player1A turn and shift to dealer
+        if  ( totalPlayers == 1 && packs[0].winCondition != null ) {
+            if ( pl1point > 21 ) {
+                endGameVar = true;
+                endGame();
+                return
+            }
+            if ( firstTime && playerTurn != "dealer" ) {
+                firstTime = false; 
+                dealerTurnFunc(); 
+                return
+            }
+            if ( dealerWins[0] != null ) {
+                endGameVar = true;
+                return
             }
         }
 
-        console.log(`Player 1A - win: ${packs[0].winCondition} /  Pts - ${pl1point} pontos`);
-        console.log(`Player 1B - win: ${packs[1].winCondition} / Pts - ${pl2point} pontos`);
-        console.log(`Croupie - win: ${dealerWins} / Pts - ${dlPoints} pontos`);
-        console.log(`Rodada de ${playerTurn}`)
-        console.log("--------------------------------");
-
-        if ( totalPlayers == 1 && packs[0].winCondition != null ) {
-            if ( dealerWins == null ) {
-                player1APass = true;
-                if ( firstTime ) { dealerTurnFunc(); };
-                firstTime = false;
-                return false;
+        if ( totalPlayers ==2 && packs[0].winCondition != null && packs[1].winCondition != null) {
+            if ( pl1point > 21 && pl2point > 21) {
+                endGameVar = true;
+                endGame();
+                return
+            }
+            if ( firstTime && playerTurn != "dealer" ) {
+                firstTime = false; 
+                dealerTurnFunc(); 
+                return
+            }
+            if ( dealerWins[0] != null && dealerWins[1] != null ) {
+                endGameVar = true;
+                return
             }
         }
-
-        if ( totalPlayers == 2 && !dealerTurn ) {
-            if ( packs[0].winCondition != null && packs[1].winCondition != null ) {
-                player1APass = true;
-                player1BPass = true;
-                if ( firstTime ) { dealerTurnFunc(); };
-                firstTime = false;
-                return false;
-            } else if ( playerTurn == "player1A" && packs[0].winCondition != null ) {
-                if ( !player1BPass ) {
-                    player1APass = true;
-                    switchPlayer("player1B");
-                    return false;
-                } else {
-                    if ( firstTime ) { dealerTurnFunc(); };
-                    firstTime = false;
-                }
-            } else if ( playerTurn == "player1B" && packs[1].winCondition != null ) {
-                if ( !player1APass ) {
-                    player1BPass = true;
-                    switchPlayer("player1A");
-                    return false;
-                } else {
-                    if ( firstTime ) { dealerTurnFunc(); };
-                    firstTime = false;
-                }
-            }
-        }
-
-        if ( totalPlayers == 1 ) {
-            if  ( packs[0].winCondition == true ) { 
-                // player 1A wins 
-                endGame(`<a href="#" id="start">Ganhou!<br><span style="font-size: 16px;">Click para iniciar</span></a>`, pl1point, pl2point, dlPoints);
-                return true;
-            } else if ( packs[0].winCondition == false ) {
-                // player 1A lost
-                endGame(`<a href="#" id="start">Perdeu!<br><span style="font-size: 16px;">Click para iniciar</span></a>`, pl1point, pl2point, dlPoints);
-                return true;
-            } else if ( packs[0].winCondition == "deuce" ) {
-                // player 1A deuce
-                endGame(`<a href="#" id="start">Empate!<br><span style="font-size: 16px;">Click para iniciar</span></a>`, pl1point, pl2point, dlPoints);
-                return true;
-            }
-        }
-
-        if ( totalPlayers == 2 && packs[0].winCondition != null && packs[1].winCondition != null ) {
-            let text = `<a href="#" id="start">`; 
-            if ( packs[1].winCondition ) {
-                text += "Mesa 1: Ganhou<br>";
-            } else if ( !packs[1].winCondition ) {
-                text += "Mesa 1: Perdeu<br>";
-            } else if ( !packs[1].winCondition == "deuce" ) {
-                text += "Mesa 1: Empatou<br>";
-            }
-            if ( packs[0].winCondition ) {
-                text += "Mesa 2: Ganhou<br>";
-            } else if ( !packs[0].winCondition ) {
-                text += "Mesa 2: Perdeu<br>";
-            } else if ( !packs[0].winCondition == "deuce" ) {
-                text += "Mesa 2: Empatou<br>";
-            }
-            text += `<span style="font-size: 16px;">Click para iniciar</span></a>`;
-            endGame (text, pl1point, pl2point, dlPoints);      
-            return true;
-        } 
     };
 
+    function rules (i , plPoints) {
+        if ( playerTurn == "dealer" ) {
+            if ( plPoints != 21 && dlPoints == 21) { packs[i].winCondition = false; dealerWins[i] = true; }
+            if ( plPoints < 21 && dlPoints < 21 && plPoints < dlPoints  ) { packs[i].winCondition = false; dealerWins[i] = true;}
+            if ( plPoints < 21 && dlPoints > 21 ) { packs[i].winCondition = true; dealerWins[i] = false; }
+            if ( plPoints > 21 && dlPoints > 21 ) { packs[i].winCondition = false; dealerWins[i] = false; }
+            if ( plPoints == dlPoints ) { packs[i].winCondition = "deuce"; dealerWins[i] = "deuce"; }
+            if ( dlPoints > 21 ) { dealerWins[i] = false; }
+        } else {
+            if ( plPoints == 21) { packs[i].winCondition = true; return true; }
+            if ( plPoints > 21 ) { packs[i].winCondition = false; return true; }
+        }
+        console.log(`rodando - rules ${i}`);
+        console.log(`Player 1A - win: ${packs[0].winCondition} /  Pts - ${pl1point} pontos`);
+        console.log(`Player 1B - win: ${packs[1].winCondition} / Pts - ${pl2point} pontos`);
+        console.log(`Croupie - win/A: ${dealerWins[0]} / Pts - ${dlPoints} pontos`);
+        console.log(`Croupie - win/B: ${dealerWins[1]} / Pts - ${dlPoints} pontos`);
+        console.log(`Rodada de ${playerTurn}`)
+        console.log("--------------------------------");
+        return false;
+    }
+
     // Function to announce end game
-    function endGame (endText, pl1point, pl2point, dlPoints) {  
+    function endGame () {  
+        console.log("rodando Endgame");
+        let text = `<a href="#" id="start">`;
+        bet1A = 0;
+        bet1B = 0;
+        if ( totalPlayers == 1 ) {
+            if  ( packs[0].winCondition == true ) { 
+                // player 1A wins
+                text += `Ganhou! $${( packs[0].bet * 2 )}`;
+                bet1A += ( packs[0].bet * 2 );
+            } else if ( packs[0].winCondition == false ) {
+                // player 1A lost
+                text += `Perdeu!`;
+            } else if ( packs[0].winCondition == "deuce" ) {
+                // player 1A deuce
+                text += `Empate! $${( packs[0].bet )}`;
+                bet1A += packs[0].bet;
+            }
+        }
+
+        if ( totalPlayers == 2 ) {
+            if ( packs[1].winCondition == true ) {
+                text += `Mesa 1: Ganhou $${(packs[1].bet)*2}`;
+                bet1B += ( packs[1].bet * 2 );
+            } else if ( packs[1].winCondition == false) {
+                text += "Mesa 1: Perdeu";
+            } else if ( packs[1].winCondition == "deuce" ) {
+                text += `Mesa 1: Empatou $${packs[1].bet}`;
+                bet1B += packs[1].bet;
+            }
+            text += "<br>";
+            if ( packs[0].winCondition == true) {
+                text += `Mesa 2: Ganhou $${(packs[0].bet)*2}`;
+                bet1A += ( packs[0].bet * 2 );
+            } else if ( packs[0].winCondition == false ) {
+                text += `Mesa 2: Perdeu`;
+            } else if ( packs[0].winCondition == "deuce" ) {
+                text += `Mesa 2: Empatou $${packs[0].bet}`;
+                bet1A += ( packs[0].bet );
+            };
+        }
+
+        text += `<br><span style="font-size: 16px;">Click para iniciar</span></a>`;
+        
         $('.control').css( "display", "none" );
         setTimeout( function () {
-            $('h2').html(endText);
-            $('#start').on('click', function(event){
+            $('h2').html(text);
+            if ( bet1A > 0 ) { $('#bet1A').html(`${$('#bet1A').html()} <span style="font-size:14px;">+$${bet1A}</span>`) };
+            if ( bet1B > 0 ) { $('#bet1B').html(`${$('#bet1B').html()} <span style="font-size:14px;">+$${bet1B}</span>`) };
+            console.log(`Player A - $${packs[0].bet}`);
+            console.log(`Player B - $${packs[1].bet}`);
+            console.log(`bet1A - $${bet1A}`);
+            console.log(`bet1B - $${bet1B}`);
+            console.log(`Total Player - $${playerCoins}`);
+            console.log('--------------------------');
+            $('#cash').html(`$${playerCoins}`);
+            $('#start').one('click', function(event){
                 event.preventDefault();
-                location.reload();
+                playerCoins += ( bet1A + bet1B );
+                playRoll(true);
             });
         }, 500 );
         $('#player1AScore').html(`<strong>${pl1point} pontos</strong>`);
         $('#player1BScore').html(`<strong>${pl2point} pontos</strong>`);
         $('#dealerscore').html(`<strong>${dlPoints} pontos</strong>`);
+        return true;
     };
 
     // Function to check split and manage second content move
@@ -493,14 +601,17 @@
             if (temp2 > 10 ) {temp2 = 10};
             if (temp1 == temp2){
                 // split palyerturn cards
-                $('#btn1Asplit').css( "display", "inline" );
+                $('#btn1Asplit').css( "display", "inline-block" );
                 $('#player1AControl').css( "display", "block" );
-                $('#btn1Asplit').on('click', function () {
+                $('#btn1Asplit').one('click', function () {
                     console.log(" ////// Dividiu ///////");
                     console.log(gameControl);
                     console.log("----------------------")
                     totalPlayers = 2 ;
+                    packs[1].bet = packs[0].bet;
                     $('#player1BContent').css( "display", "block" );
+                    $('#bet1B').css( "display", "block" );
+                    $('#bet1B').html(`$${packs[1].bet}`);
                     $('#btn1Asplit').css( "display", "none" );
                     getBoardsPositions();
                     //remove card from pack1
@@ -509,18 +620,18 @@
                     $('#p0card2').clone().appendTo("#player1Bpack");
                     $("#player1Bpack div").attr( "id", 'p1card1');
                     $('#p1card1').css("left","0px");
-                    let playBoardWidth = $('#playerboard').width();
-                    if ( playBoardWidth < 450) {
-                        $('#player1BContent').animate({ top: `175px` }, 550, 'swing', getBoardsPositions );
-                    } else {
-                        $('#player1BContent').animate({ left: `${(playBoardWidth/2)-105}px` }, 500, 'swing' );
-                        $('#player1AContent').animate({ left: `${(playBoardWidth/2)+105}px` }, 550, 'swing', getBoardsPositions );
-                    }
+                    playBoardWidth = $('#playerboard').width();
+                    $('#player1BContent').animate({ left: `${(playBoardWidth/2)-80}px` }, 500, 'swing' );
+                    $('#bet1B').animate({ left: `${(playBoardWidth/2)-80}px` }, 500, 'swing' );
+                    $('#bet1A').animate({ left: `${(playBoardWidth/2)+80}px` }, 550, 'swing' );
+                    $('#player1AContent').animate({ left: `${(playBoardWidth/2)+80}px` }, 550, 'swing', getBoardsPositions );
                     $('#p0card2').remove();
                     // add card to pack2
                     gameControl["pack2"].cards = { 
                                 card1: { card: removedCard, reveal: true }
-                            }
+                            };
+                    playerCoins -= packs[1].bet;
+                    $('bet1B').html(`$${packs[1].bet}`);
                     calcScore();
                     switchPlayer ("player1A")
                 });
