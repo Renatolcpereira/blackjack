@@ -300,6 +300,30 @@ h1 {
     display: inline-block;
 }
 
+.btndouble {
+    width: 40px;
+    line-height: 40px;
+    border-radius: 100%;
+    background-image: url(img/btn-double.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    text-align: center;
+    display: none;
+}
+
+.btngiveup {
+    width: 40px;
+    line-height: 40px;
+    border-radius: 100%;
+    background-image: url(img/btn-giveup.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    text-align: center;
+    display: inline-block;
+}
+
 .btntxt {
     display: inline-block;
     vertical-align: middle;
@@ -350,6 +374,7 @@ h1 {
 
     #fichasbox {
         margin: auto;
+        margin-top: 5px;
         float: none;
     }
 }
