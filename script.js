@@ -7,7 +7,7 @@
                      "c01","c02","c03","c04","c05","c06","c07","c08","c09","c10","c11","c12","c13", 
                      "o01","o02","o03","o04","o05","o06","o07","o08","o09","o10","o11","o12","o13"]
                      
-    /* let allCards = ["p02","p01","p03","e01","p09","p10","p07","p08","p09","p10","p11","p12","p13", 
+    /* let allCards = ["p01","c01","p13","e13","p09","p10","p07","p08","p09","p10","p11","p12","p13", 
                      "e01","e02","e03","e04","e05","e06","e07","e08","e09","e10","e11","e12","e13", 
                      "c01","c02","c03","c04","c05","c06","c07","c08","c09","c10","c11","c12","c13", 
                      "o01","o02","o03","o04","o05","o06","o07","o08","o09","o10","o11","o12","o13"] */
@@ -45,6 +45,7 @@
     let dealerScore = [ 0 , 0 ];
     let dealerWins = [ null, null ];
     let dlPoints = 0;
+    let dealerBlackjack = false;
 
     // Player vars
     let plTotalCards = 0;
@@ -62,6 +63,14 @@
     let cardsPosY = 0;
 
     playRoll(false);
+
+    // When the user clicks on div, open the popup
+    $('#infobox').on('click', function (event) {
+        event.preventDefault();
+        $('#myPopup').toggle("show");
+    });
+
+    
 
     function playRoll(startroll) {
         if (startroll) {
@@ -95,6 +104,7 @@
             dlPoints = 0;
             doubleA = false;
             doubleB = false;
+            dealerBlackjack = false;
             playBoardWidth = $('#playerboard').width();
             $('#player1BContent').animate({ left: `50%` }, 500, 'swing', function () {
                 $('#player1BContent').css( "display" , "none" ); 
@@ -112,12 +122,15 @@
             $('#dealerscore').html('<strong>0 pontos</strong>');
             $('#bet1A').html("$0");
             $('#bet1B').html("$0");
+            $('#btn1Asplit').off();
             $('#btn1Acontinue').off();
             $('#btn1Bcontinue').off();
             $('#btn1Apass').off();
             $('#btn1Bpass').off();
             $('#btn1Adouble').off();
             $('#btn1Bdouble').off();
+            $('#btn1Agiveup').off();
+            $('#btn1Bgiveup').off();
             $('#player1AContent').off();
             $('#player1BContent').off();
             $('#btn1Acontinue').css( "display" , "inline-block" );
@@ -134,7 +147,7 @@
         $('#cash').html(`$${playerCoins}`);
 
         // Start Button click event
-        $(window).one('click', function (event) {
+        $('#start').one('click', function (event) {
             event.preventDefault();
             $('#dealerboard p').remove();
             $('#playerContent p').remove();
@@ -261,15 +274,15 @@
             $('#btn1Agiveup').css( "display", "none" );
             $('#btn1Acontinue').css( "display", "none" );
             $('#btn1Apass').css( "display", "none" );
-            $('h2').html(`Você desistiu!<br><a href="#" id="start"><span style="font-size: 16px;">Click para iniciar</span></a>`);
-            $('#bet1A').html(`$${packs[0].bet} <span style="font-size:14px;">-$${(packs[0].bet/2)}</span>`);
-            packs[0].bet = packs[0].bet / 2;
-            playerCoins += packs[0].bet;
-            $('#cash').html(`$${playerCoins}`);
-            $('#start').one('click', function(event){
-                event.preventDefault();
-                playRoll(true);
-            });
+            packs[0].winCondition = "giveup";
+            dealerWins[0] = true;
+            player1APass = true;
+            if ( totalPlayers == 1 || ( totalPlayers == 2 && player1BPass ) ) {
+                endGame();
+            } else {
+                $('h2').html(`Mesa 2 desistiu!`);
+                switchPlayer("player1B");
+            };      
         });
 
         // Player 1B - Giveup Buttom
@@ -279,15 +292,15 @@
             $('#btn1Bgiveup').css( "display", "none" );
             $('#btn1Bcontinue').css( "display", "none" );
             $('#btn1Bpass').css( "display", "none" );
-            $('h2').html(`Você desistiu!<br><a href="#" id="start"><span style="font-size: 16px;">Click para iniciar</span></a>`);
-            $('#bet1A').html(`$${packs[0].bet} <span style="font-size:14px;">-$${(packs[0].bet/2)}</span>`);
-            packs[0].bet = packs[0].bet / 2;
-            playerCoins += packs[0].bet;
-            $('#cash').html(`$${playerCoins}`);
-            $('#start').one('click', function(event){
-                event.preventDefault();
-                playRoll(true);
-            });
+            packs[1].winCondition = "giveup";
+            dealerWins[1] = true;
+            player1BPass = true;
+            if ( player1APass ) {
+                endGame();
+            } else {
+                $('h2').html(`Mesa 1 desistiu!`);
+                switchPlayer("player1A");
+            };
         });
 
         // Player 1A - Switch
@@ -487,7 +500,7 @@
                     }
                 };     
             };
-            // Check for BlackJack
+            // Check for BlackJack for players
             if ( cardsArray.length == 2 && packs[i].points2 == 21 ) { packs[i].blackjack = true; }
         };
 
@@ -506,7 +519,7 @@
                     dealerScore[0] += temp
                     dealerScore[1] += temp
                 };
-                if ( dealerScore[1] <= 21) { 
+                if ( dealerScore[1] < 21) { 
                     $('#dealerscore').html(`<strong>${dealerScore[1]} pontos</strong>`);
                 } else if (dealerScore[1] == 21 && cards.length == 2 ) {
                     $('#dealerscore').html(`<strong> Blackjack </strong>`);
@@ -517,6 +530,8 @@
                 }
             }
         }
+        // Check for BlackJack for dealer
+        if ( cards.length == 2 && dealerScore[1] == 21 ) { dealerBlackjack = true; }
 
         if ( dealerScore[0] == 21 || dealerScore[1] == 21 ) { dlPoints = 21;}
         else if ( dealerScore[1] > 21 ) { dlPoints = dealerScore[0];}
@@ -585,7 +600,7 @@
             }
         }
 
-        if ( totalPlayers ==2 && ( packs[0].winCondition != null || player1APass ) && ( packs[1].winCondition != null || player1BPass ) ) {
+        if ( totalPlayers == 2 && ( packs[0].winCondition != null || player1APass ) && ( packs[1].winCondition != null || player1BPass ) ) {
             if ( pl1point > 21 && pl2point > 21) {
                 endGameVar = true;
                 endGame();
@@ -605,6 +620,11 @@
 
     function rules (i , plPoints) {
         if ( playerTurn == "dealer" ) {
+            if ( dealerBlackjack ) {
+                if ( packs[i].blackjack ) { packs[i].winCondition = "deuce"; dealerWins[i] = "deuce"; return}
+                else { packs[i].winCondition = false; dealerWins[i] = true; return }
+            }
+            if ( packs[i].winCondition == "giveup" ) { dealerWins[i] = true; return }
             if ( plPoints != 21 && dlPoints == 21) { packs[i].winCondition = false; dealerWins[i] = true; }
             if ( plPoints < 21 && dlPoints < 21 && plPoints < dlPoints  ) { packs[i].winCondition = false; dealerWins[i] = true;}
             if ( plPoints < 21 && dlPoints > 21 ) { packs[i].winCondition = true; dealerWins[i] = false; }
@@ -631,6 +651,7 @@
         let text = `<a href="#" id="start">`;
         console.log(`BlackJack 1A: ${packs[0].blackjack}`);
         console.log(`BlackJack 1B: ${packs[1].blackjack}`);
+        console.log(`BlackJack Dealer: ${dealerBlackjack}`);
         bet1A = 0;
         bet1B = 0;
         if ( totalPlayers == 1 ) {
@@ -652,6 +673,10 @@
                 // player 1A deuce
                 text += `Empate! +$0`;
                 bet1A = 0;
+            } else if ( packs[0].winCondition == "giveup" ) {
+                // player 1A giveup
+                text += `Desistiu! -$${packs[0].bet/2}`;
+                bet1A = -( packs[0].bet / 2);
             }
         }
 
@@ -671,7 +696,10 @@
             } else if ( packs[1].winCondition == "deuce" ) {
                 text += `Mesa 1: Empatou +$0`;
                 bet1B = 0;
-            }
+            } else if ( packs[1].winCondition == "giveup" ) {
+                text += `Mesa 1: Desistiu -$${packs[1].bet/2}`;
+                bet1B = -( packs[1].bet / 2);
+            };
             text += "<br>";
             if ( packs[0].winCondition == true) {
                 if ( packs[0].blackjack ) {
@@ -688,6 +716,9 @@
             } else if ( packs[0].winCondition == "deuce" ) {
                 text += `Mesa 2: Empatou +$0`;
                 bet1A = 0;
+            } else if ( packs[0].winCondition == "giveup" ) {
+                text += `Mesa 2: Desistiu -$${packs[0].bet/2}`;
+                bet1A = -( packs[0].bet / 2);
             };
         }
 
@@ -698,16 +729,24 @@
             $('h2').html(text);
             if ( packs[0].winCondition == false ) {
                 $('#bet1A').html(`$${packs[0].bet}`);
+            } else if ( packs[0].winCondition == "giveup" ) {
+                $('#bet1A').html(`$${packs[0].bet} <span style="font-size:14px;">-$${bet1A*(-1)}</span>`);
             } else {
                 $('#bet1A').html(`$${packs[0].bet} <span style="font-size:14px;">+$${bet1A}</span>`);
             }
             if ( packs[1].winCondition == false ) {
                 $('#bet1B').html(`$${packs[1].bet}`);
+            } else if ( packs[1].winCondition == "giveup" ) {
+                $('#bet1B').html(`$${packs[1].bet} <span style="font-size:14px;">-$${bet1B*(-1)}</span>`);
             } else {
                 $('#bet1B').html(`$${packs[1].bet} <span style="font-size:14px;">+$${bet1B}</span>`);
             }
             console.log(`Player A - $${packs[0].bet}`);
+            console.log(`Player A - Winning: ${packs[0].winCondition}`);
+            console.log(`Croupie/A - Winning: ${dealerWins[0]}`);
             console.log(`Player B - $${packs[1].bet}`);
+            console.log(`Player B - Winning: ${packs[1].winCondition}`);
+            console.log(`Croupie/B - Winning: ${dealerWins[1]}`);
             console.log(`bet1A - $${bet1A}`);
             console.log(`bet1B - $${bet1B}`);
             console.log(`Total Player - $${playerCoins}`);
@@ -729,7 +768,12 @@
         } else {
             $('#player1BScore').html(`<strong>${pl2point} pontos</strong>`);
         }
-        $('#dealerscore').html(`<strong>${dlPoints} pontos</strong>`);
+        if ( dealerBlackjack) {
+            $('#dealerscore').html(`<strong>Blackjack</strong>`);
+        } else {
+            $('#dealerscore').html(`<strong>${dlPoints} pontos</strong>`);
+        }
+        
         return true;
     };
 
