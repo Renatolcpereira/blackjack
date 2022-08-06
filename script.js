@@ -32,7 +32,7 @@
     let playerTurn = "player1A";
     let totalPlayers = 1;
     let firstTime = true; // var to avoid infinite loop inside checkWinningCondition funct
-    let playerCoins = 500;
+    let playerCoins = 549;
     let playBoardWidth = $('#playerboard').width();
     let endGameVar = false;
     let shiftCondtion = null;
@@ -69,8 +69,6 @@
         event.preventDefault();
         $('#myPopup').toggle("show");
     });
-
-    
 
     function playRoll(startroll) {
         if (startroll) {
@@ -169,7 +167,7 @@
                 $('#btn1Adouble').css( "display", "none" );
                 $('#btn1Acontinue').css( "display", "none" );
                 $('#btn1Apass').css( "display", "none" );
-
+                $('#btn1Agiveup').css( "display", "none" );
             } else {
                 packs[0].bet = 50;
                 playerCoins -= packs[0].bet;

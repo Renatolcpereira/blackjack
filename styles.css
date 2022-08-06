@@ -143,57 +143,6 @@ h1 {
     border: 1px solid #dbd400;
 }
 
-/* style for pocket and coins*/
-#pocket {
-    width: 240px;
-    left: 10vw;
-    bottom: 100px;
-    position: relative;
-    transform: rotate(45deg);
-}
-
-.coins {
-    position: absolute;
-    width: 60px;
-    height: 200px;
-    display: inline-block;
-    top: -200px;
-}
-
-#coins1 {
-    left: 0;
-}
-
-#coins5 {
-    left: 60px;
-}
-
-#coins10 {
-    left: 120px;
-}
-
-#coins50 {
-    left: 180px;
-}
-
-.coin {
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, 0);
-    bottom: 0px;
-    width: 50px;
-    height: 50px;
-}
-
-#coin502 {
-    bottom: 10px;
-}
-
-#coin503 {
-    bottom: 20px;
-}
-
-
 /* style for playcardboard */
 #playcardsboard {
     position: relative;
@@ -331,11 +280,6 @@ h1 {
     height: 20px;
 }
 
-.control button {
-    display: inline;
-    font-size: 10px;
-}
-
 #btn1Asplit {
     display: none;
 }
@@ -353,64 +297,38 @@ h1 {
     font-size: 20px;
 }
 
-.btncontinue {
+.control div {
     width: 40px;
     line-height: 40px;
     border-radius: 100%;
-    background-image: url(img/btn-continue.png);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     text-align: center;
     display: inline-block;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.btncontinue {
+    background-image: url(img/btn-continue.png);
 }
 
 .btnparar {
-    width: 40px;
-    line-height: 40px;
-    border-radius: 100%;
     background-image: url(img/btn-stop.png);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    text-align: center;
-    display: inline-block;
 }
 
 .btnsplit {
-    width: 40px;
-    line-height: 40px;
-    border-radius: 100%;
     background-image: url(img/btn-split.png);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    text-align: center;
-    display: inline-block;
 }
 
 .btndouble {
-    width: 40px;
-    line-height: 40px;
-    border-radius: 100%;
     background-image: url(img/btn-double.png);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    text-align: center;
     display: none;
 }
 
 .btngiveup {
-    width: 40px;
-    line-height: 40px;
-    border-radius: 100%;
     background-image: url(img/btn-giveup.png);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    text-align: center;
-    display: inline-block;
 }
 
 .btntxt {
@@ -480,12 +398,6 @@ h1 {
         top: -30px;
         right: 120%;
     }
-
-    #pocket {
-        left: -120px;
-        bottom: 95vh;
-        transform: rotate(90deg);
-    }
 }
 
 @media (min-width: 479px) {
@@ -510,13 +422,6 @@ h1 {
         top: 50%;
         left: 50%;
     }
-
-    #pocket {
-        left: 1vw;
-        bottom: 100px;
-        transform: rotate(25deg);
-    }
-
 }
 
 
@@ -526,19 +431,10 @@ h1 {
         margin-left: 15%;
     }
 
-    #pocket {
-        left: 1vw;
-        bottom: 100px;
-        transform: rotate(25deg);
-    }
     
 }
 
 @media (min-width: 1024px) {
-    #pocket {
-        left: 10vw;
-        bottom: 100px;
-        transform: rotate(45deg);
-    }
+
     
 }
