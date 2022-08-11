@@ -7,7 +7,7 @@
                      "c01","c02","c03","c04","c05","c06","c07","c08","c09","c10","c11","c12","c13", 
                      "o01","o02","o03","o04","o05","o06","o07","o08","o09","o10","o11","o12","o13"]
                      
-    /* let allCards = ["p01","c01","p13","e13","p09","p10","p07","p08","p09","p10","p11","p12","p13", 
+    /* let allCards = ["p12","c11","p13","e13","p09","p10","p07","p08","p09","p10","p11","p12","p13", 
                      "e01","e02","e03","e04","e05","e06","e07","e08","e09","e10","e11","e12","e13", 
                      "c01","c02","c03","c04","c05","c06","c07","c08","c09","c10","c11","c12","c13", 
                      "o01","o02","o03","o04","o05","o06","o07","o08","o09","o10","o11","o12","o13"] */
@@ -32,7 +32,7 @@
     let playerTurn = "player1A";
     let totalPlayers = 1;
     let firstTime = true; // var to avoid infinite loop inside checkWinningCondition funct
-    let playerCoins = 549;
+    let playerCoins = 600;
     let playBoardWidth = $('#playerboard').width();
     let endGameVar = false;
     let shiftCondtion = null;
@@ -54,6 +54,8 @@
     let pl1point = 0;
     let pl2point = 0;
     let bet1A = 0;
+    let bet1Acoins = [];
+    let bet1Bcoins = [];
     let bet1B = 0;
     let doubleA = false;
     let doubleB = false;
@@ -62,7 +64,20 @@
     let cardsPosX = 0;
     let cardsPosY = 0;
 
+    // Coins control vars
+    let coins01Qty = 0;
+    let coins01Array = [];
+    let coins05Qty = 0;
+    let coins05Array = [];
+    let coins10Qty = 0;
+    let coins10Array = [];
+    let coins50Qty = 0; 
+    let coins50Array = [];
+    let PlayerCoinsQty = [ 0, coins01Qty, coins05Qty, coins10Qty, coins50Qty];
+
     playRoll(false);
+
+    addCoinsQty(playerCoins);
 
     // When the user clicks on div, open the popup
     $('#infobox').on('click', function (event) {
@@ -72,7 +87,7 @@
 
     function playRoll(startroll) {
         if (startroll) {
-            // restart the game vars
+            // restart the game board
             allCards = ["p01","p02","p03","p04","p05","p06","p07","p08","p09","p10","p11","p12","p13", 
                         "e01","e02","e03","e04","e05","e06","e07","e08","e09","e10","e11","e12","e13", 
                         "c01","c02","c03","c04","c05","c06","c07","c08","c09","c10","c11","c12","c13", 
@@ -103,6 +118,9 @@
             doubleA = false;
             doubleB = false;
             dealerBlackjack = false;
+            bet1Acoins = [];
+            bet1Bcoins = [];
+            PlayerCoinsQty = [ 0, coins01Qty, coins05Qty, coins10Qty, coins50Qty];
             playBoardWidth = $('#playerboard').width();
             $('#player1BContent').animate({ left: `50%` }, 500, 'swing', function () {
                 $('#player1BContent').css( "display" , "none" ); 
@@ -118,8 +136,8 @@
             $('#player1AScore').html('<strong>0 pontos</strong>');
             $('#player1BScore').html('<strong>0 pontos</strong>');
             $('#dealerscore').html('<strong>0 pontos</strong>');
-            $('#bet1A').html("$0");
-            $('#bet1B').html("$0");
+            $('#bet1A p').html("$0");
+            $('#bet1B p').html("$0");
             $('#btn1Asplit').off();
             $('#btn1Acontinue').off();
             $('#btn1Bcontinue').off();
@@ -139,51 +157,95 @@
             $('#btn1Bgiveup').css( "display", "inline-block" );
             $('#player1AContent').css("background-color", "transparent");
             $('#player1BContent').css("background-color", "transparent");
+            $('.cardpack').css( "display", "none" );
+            $('.score').css( "display", "none");
+            $('#dealerboard p').css( "display", "block" );
+            $('#playerContent').css( "display", "block" );
+            $('h2').html(`<a href="#" id="start">Faça sua aposta<br><span style="font-size: 14px;"> e click aqui para iniciar</span></a>`);
+            $('.coin').css( "animation", "pulsate 0.5s infinite alternate");
         };
 
         shuffleCards();
         $('#cash').html(`$${playerCoins}`);
 
         // Start Button click event
-        $('#start').one('click', function (event) {
+        $('#start').on('click', function (event) {
             event.preventDefault();
-            $('#dealerboard p').remove();
-            $('#playerContent p').remove();
-            $('#playerContent').remove();
-            $('#dealerpack').css( "display", "block" );
-            $('#dealerscore').css( "display", "block" );
-            $('.cardpack').css( "display", "block" );
-            $('.score').css( "display", "block");
+            if (packs[0].bet > 0) {
+                $('#coin01').off();
+                $('#coin05').off();
+                $('#coin10').off();
+                $('#coin50').off();
+                $('.coin').css("animation", "off");
 
-            $('#playerboard').css({"border": "0", "width": "100%"});
-            $('#player1AContent').css( "display", "block" );
-            
-            $('#player1AControl').css( "display", "block" );
-            $('h2').html("Boa sorte !");
+                $('#dealerboard p').css( "display", "none" );
+                $('#playerContent').css( "display", "none" );
+                $('.cardpack').css( "display", "block" );
+                $('.score').css( "display", "block");
+    
+                $('#playerboard').css({"border": "0", "width": "100%"});
+                $('#player1AContent').css( "display", "block" );
+                
+                $('#player1AControl').css( "display", "block" );
+                $('h2').html("Boa sorte !");
+    
+                if ( playerCoins < 0 ) {
+                    $('h2').html("Sem fundos!<br>Reload Page");
+                    $('#btn1Asplit').css( "display", "none" );
+                    $('#btn1Adouble').css( "display", "none" );
+                    $('#btn1Acontinue').css( "display", "none" );
+                    $('#btn1Apass').css( "display", "none" );
+                    $('#btn1Agiveup').css( "display", "none" );
+                } else {
+                    $('#start').off();
+                    getBoardsPositions();
+                    dealerCardFunc(true, function () { dealerCardFunc(false); });
+                    playerCardFunc(true, function () { playerCardFunc(true);  });
+                    setTimeout( function () { checkSplit(); }, 1000); 
+                }       
+            };    
+        });
 
-            if ( playerCoins < 50 ) {
-                $('h2').html("Sem fundos!<br>Reload Page");
-                $('#btn1Asplit').css( "display", "none" );
-                $('#btn1Adouble').css( "display", "none" );
-                $('#btn1Acontinue').css( "display", "none" );
-                $('#btn1Apass').css( "display", "none" );
-                $('#btn1Agiveup').css( "display", "none" );
-            } else {
-                packs[0].bet = 50;
-                playerCoins -= packs[0].bet;
-                $('#bet1A').html(`$${packs[0].bet}`);
-                $('#cash').html(`$${playerCoins}`);
-                if ( playerCoins >= packs[0].bet ) { $('#btn1Adouble').css( "display", "inline-block" ); };
-                getBoardsPositions();
-                dealerCardFunc(true, function () { dealerCardFunc(false); });
-                playerCardFunc(true, function () { playerCardFunc(true);  });
-                setTimeout( function () { checkSplit(); }, 1000); 
-            }         
+         // Controle de apostas
+         $('#coin01').on('click' ,function (event) {
+            event.preventDefault();
+            console.log(`coins01Qty -${coins01Qty}`);
+            if ( coins01Qty > 0) {
+                moveToBet(1, "bet1A" );                
+            };          
+        });
+
+        $('#coin05').on('click' ,function (event) {
+            event.preventDefault();
+            console.log(`coins05Qty -${coins05Qty}`);
+            if ( coins05Qty > 0) {
+                moveToBet(5, "bet1A" );
+            };          
+        });
+
+        $('#coin10').on('click' ,function (event) {
+            event.preventDefault();
+            console.log(`coins10Qty -${coins10Qty}`);
+            if ( coins10Qty > 0) {
+                moveToBet(10, "bet1A" );
+            };          
+        });
+
+        $('#coin50').on('click', function (event) {
+            event.preventDefault();
+            console.log(`coins50Qty -${coins50Qty}`);
+            if ( coins50Qty > 0) {
+                moveToBet(50, "bet1A" );
+            };          
         });
 
         // Player 1A - Continue Buttom
         $('#btn1Acontinue').on('click', function (event) {
             event.preventDefault();
+            $('#coin01').off();
+            $('#coin05').off();
+            $('#coin10').off();
+            $('#coin50').off();
             $('#btn1Asplit').css( "display", "none" );
             $('#btn1Adouble').css( "display", "none" );
             $('#btn1Agiveup').css( "display", "none" );
@@ -206,6 +268,10 @@
         // Player 1A - Pass Buttom
         $('#btn1Apass').on('click', function (event) {
             event.preventDefault();
+            $('#coin01').off();
+            $('#coin05').off();
+            $('#coin10').off();
+            $('#coin50').off();
             $('h2').html("Boa Sorte!");
             if ( totalPlayers == 1) {
                 dealerTurnFunc();
@@ -226,8 +292,8 @@
 
         // Player 1B - Pass Buttom
         $('#btn1Bpass').on('click', function (event) {
-            $('h2').html("Boa Sorte!");
             event.preventDefault();
+            $('h2').html("Boa Sorte!");
             if ( !player1APass) {
                 player1BPass = true;
                 $('#btn1Bcontinue').css("display","none");
@@ -242,11 +308,20 @@
         });
 
         // Player 1A - Double Buttom
-        $('#btn1Adouble').one('click', function () {
+        $('#btn1Adouble').one('click', function (event) {
+            event.preventDefault();
+            $('#coin01').off();
+            $('#coin05').off();
+            $('#coin10').off();
+            $('#coin50').off();
+            console.log("Dobrando Bet1A");
+            let coinsArray = [];
+            let coinType = "";
             doubleA = true;
-            playerCoins -= packs[0].bet;
-            packs[0].bet += packs[0].bet;
-            $('#bet1A').html(`$${packs[0].bet}`);
+
+            moveToBet(packs[0].bet, "bet1A");
+
+            $('#bet1A p').html(`$${packs[0].bet}`);
             $('#cash').html(`$${playerCoins}`);
             $('#btn1Adouble').css( "display", "none" );
             playerCardFunc(true);
@@ -254,11 +329,14 @@
         });
 
         // Player 1B - Double Buttom
-        $('#btn1Bdouble').one('click', function () {
+        $('#btn1Bdouble').one('click', function (event) {
+            event.preventDefault();
+            console.log("Dobrando Bet1B");
             doubleB = true;
-            playerCoins -= packs[1].bet;
-            packs[1].bet += packs[1].bet;
-            $('#bet1B').html(`$${packs[1].bet}`);
+
+            moveToBet(packs[1].bet, "bet1B");
+
+            $('#bet1B p').html(`$${packs[1].bet}`);
             $('#cash').html(`$${playerCoins}`);
             $('#btn1Bdouble').css( "display", "none" );
             playerCardFunc(true);
@@ -266,7 +344,12 @@
         });
 
         // Player 1A - Giveup Buttom
-        $('#btn1Agiveup').one('click', function () {
+        $('#btn1Agiveup').one('click', function (event) {
+            event.preventDefault();
+            $('#coin01').off();
+            $('#coin05').off();
+            $('#coin10').off();
+            $('#coin50').off();
             $('#btn1Asplit').css( "display", "none" );
             $('#btn1Adouble').css( "display", "none" );
             $('#btn1Agiveup').css( "display", "none" );
@@ -284,7 +367,8 @@
         });
 
         // Player 1B - Giveup Buttom
-        $('#btn1Bgiveup').one('click', function () {
+        $('#btn1Bgiveup').one('click', function (event) {
+            event.preventDefault();
             $('#btn1Bsplit').css( "display", "none" );
             $('#btn1Bdouble').css( "display", "none" );
             $('#btn1Bgiveup').css( "display", "none" );
@@ -302,18 +386,350 @@
         });
 
         // Player 1A - Switch
-        $('#player1AContent').on('click', "#player1Apack", function(){ 
+        $('#player1AContent').on('click', "#player1Apack", function (event) {
+            event.preventDefault(); 
             if ( packs[0].winCondition == null ) {
                 switchPlayer("player1A"); 
             }
         });
 
         // Player 1B - Switch
-        $('#player1BContent').on('click', "#player1Bpack", function(){ 
+        $('#player1BContent').on('click', "#player1Bpack", function(event) {
+            event.preventDefault(); 
             if ( packs[1].winCondition == null ) {
                 switchPlayer("player1B"); 
             } 
         });
+    };
+
+    // funcition to move coins to Bet1A
+    function moveToBet (coinQty, betBoard) {
+        let betx = 0;
+        let bety = 0; 
+        let coinRemoved = "";
+
+        // bet position
+        betx = $(`#${betBoard}`).offset().left;
+        bety = $(`#${betBoard}`).offset().top;
+
+        let x = coinQty % 50;
+        let coins50 = ( coinQty - x ) / 50; // among of 50 coin
+        let idname = "";
+        console.log(`coinQty % 50 = ${x}`);
+        console.log(`( coinQty - x ) / 50 = ${coins50}`);
+        while ( coins50 > coins50Qty ) {
+            coins50--;
+        }
+        for ( let i = 1; i <= coins50 ; i++) {
+            moveSingleCoin(50, betBoard, betx, bety );
+        }
+        coinQty = coinQty - ( coins50 * 50);
+
+        x = coinQty % 10;
+        let coins10 = ( coinQty - x ) / 10; // among of 10 coin
+        if ( coins10 > coins10Qty && coins50Qty > 0 ) {
+            coinRemoved = coins50Array.pop();
+            coins50Qty--;
+            $(`#${coinRemoved}`).animate({ top: "-1000px"}, 2000, 'swing', function () { 
+                $(`#${coinRemoved}`).remove();
+            });
+            for (let i = 1; i < 6; i++ ) {
+                rndX = Math.round(Math.random()*40)-(40/2);
+                rndY = Math.round(Math.random()*40)-(40/2);
+                coins10Qty += 1;
+                if ( coins10Qty < 10 ) {
+                    idname = `coin10_0${coins10Qty}`;
+                } else {
+                    idname = `coin10_${coins10Qty}`;
+                }
+                coins10Array.push(idname);
+                $(`#coin10`).append(`<img id="${idname}" class="coin" style="left: 0vw; bottom: 1000px;" src="img/coin10.png">`);
+                $(`#${idname}`).animate({ left: `${30 - rndX}px`, bottom: `${0 - rndY}px`}, 500, 'swing');
+            };
+        };
+        while ( coins10 > coins10Qty ) {
+            coins10--;
+        }
+        for ( let i = 1; i <= coins10; i++) {
+            moveSingleCoin(10, betBoard, betx, bety );
+        }
+        coinQty = coinQty - ( coins10 * 10);
+
+        x = coinQty % 5;
+        let coins05 = ( coinQty - x ) / 5; // among of 5 coin
+        if ( coins05 > coins05Qty && coins10Qty > 0 ) {
+            coinRemoved = coins10Array.pop();
+            coins10Qty--;
+            $(`#${coinRemoved}`).animate({ top: "-1000px"}, 2000, 'swing', function () { 
+                $(`#${coinRemoved}`).remove();
+            });
+            for (let i = 1; i < 3; i++ ) {
+                rndX = Math.round(Math.random()*40)-(40/2);
+                rndY = Math.round(Math.random()*40)-(40/2);
+                coins05Qty += 1;
+                if ( coins05Qty < 10 ) {
+                    idname = `coin05_0${coins05Qty}`;
+                } else {
+                    idname = `coin05_${coins05Qty}`;
+                }
+                coins05Array.push(idname);
+                $(`#coin05`).append(`<img id="${idname}" class="coin" style="left: 0vw; bottom: 1000px;" src="img/coin05.png">`);
+                $(`#${idname}`).animate({ left: `${30 - rndX}px`, bottom: `${0 - rndY}px`}, 500, 'swing');
+            };
+        };
+        while ( coins05 > coins05Qty ) {
+            coins05--;
+        }
+        for ( let i = 1; i <= coins05; i++) {
+            moveSingleCoin(5, betBoard, betx, bety );
+        }
+        coinQty = coinQty - ( coins05 * 5);
+
+        let coins01 = coinQty; // among of 1 coin
+        if ( coins01 > coins01Qty && coins05Qty > 0 ) {
+            coinRemoved = coins05Array.pop();
+            coins05Qty--;
+            $(`#${coinRemoved}`).animate({ top: "-1000px"}, 2000, 'swing', function () { 
+                $(`#${coinRemoved}`).remove();
+            });
+            for (let i = 1; i < 6; i++ ) {
+                rndX = Math.round(Math.random()*40)-(40/2);
+                rndY = Math.round(Math.random()*40)-(40/2);
+                coins01Qty += 1;
+                if ( coins01Qty < 10 ) {
+                    idname = `coin01_0${coins01Qty}`;
+                } else {
+                    idname = `coin01_${coins01Qty}`;
+                }
+                coins01Array.push(idname);
+                $(`#coin01`).append(`<img id="${idname}" class="coin" style="left: 0vw; bottom: 1000px;" src="img/coin01.png">`);
+                $(`#${idname}`).animate({ left: `${30 - rndX}px`, bottom: `${0 - rndY}px`}, 500, 'swing');
+            };
+        };
+        for ( let i = 1; i <= coins01; i++) {
+            moveSingleCoin(1, betBoard, betx, bety );
+        }
+
+        $(`#${betBoard} p`).html(`$${packs[0].bet}`);
+        $('#cash').html(`$${playerCoins}`);
+        bet1Acoins.sort()
+        console.log(bet1Acoins);
+        if ( playerCoins > packs[0].bet ) { $('#btn1Adouble').css( "display", "inline-block" ); };
+    };
+
+    function moveSingleCoin(coinType, betBoard, betx, bety) {
+        let coinX = 0;
+        let coinY = 0;
+        let rndX = `${Math.round(Math.random()*50)-25}`;
+        let rndY = `${Math.round(Math.random()*40)-25}`;
+        let coinToMove = "";
+        let i = 0;
+
+        if ( playerTurn == "player1B" ) { i = 1; };
+
+        if ( coinType == 1) {
+            coinToMove = coins01Array.pop();
+            coinX = $(`#${coinToMove}`).offset().left;
+            coinY = $(`#${coinToMove}`).offset().top;
+            $(`#${betBoard}`).append(`<img id="${betBoard}_${coinToMove}" class="coinbet" style="left: ${coinX-betx}px; top: ${coinY-bety}px;" src="img/coin01.png">`);
+            coins01Qty--;
+            packs[i].bet++;
+            playerCoins--;
+        } else if ( coinType == 5) {
+            coinToMove = coins05Array.pop();
+            coinX = $(`#${coinToMove}`).offset().left;
+            coinY = $(`#${coinToMove}`).offset().top;
+            $(`#${betBoard}`).append(`<img id="${betBoard}_${coinToMove}" class="coinbet" style="left: ${coinX-betx}px; top: ${coinY-bety}px;" src="img/coin05.png">`);
+            coins05Qty--;
+            packs[i].bet += 5;
+            playerCoins -= 5;
+        } else if ( coinType == 10) {
+            coinToMove = coins10Array.pop();
+            coinX = $(`#${coinToMove}`).offset().left;
+            coinY = $(`#${coinToMove}`).offset().top;
+            $(`#${betBoard}`).append(`<img id="${betBoard}_${coinToMove}" class="coinbet" style="left: ${coinX-betx}px; top: ${coinY-bety}px;" src="img/coin10.png">`);
+            coins10Qty--;
+            packs[i].bet += 10;
+            playerCoins -= 10;
+        }else if ( coinType == 50) {
+            coinToMove = coins50Array.pop();
+            coinX = $(`#${coinToMove}`).offset().left;
+            coinY = $(`#${coinToMove}`).offset().top;
+            $(`#${betBoard}`).append(`<img id="${betBoard}_${coinToMove}" class="coinbet" style="left: ${coinX-betx}px; top: ${coinY-bety}px;" src="img/coin50.png">`);
+            coins50Qty--;
+            packs[i].bet += 50;
+            playerCoins -= 50;
+        }
+        if ( betBoard == "bet1A" ) {
+            bet1Acoins.push(`bet1A_${coinToMove}`);
+        } else {
+            bet1Bcoins.push(`bet1B_${coinToMove}`);
+        }
+        $(`#${coinToMove}`).remove();
+        $(`#${betBoard}_${coinToMove}`).animate({ left: `${rndX}`, top: `${rndY}`}, 500, 'swing');
+    }
+
+    function moveToPocket(playerBet, callback) {
+        console.log("Move to pocket funcition");
+        let coinX = 0;
+        let coinY = 0;
+        let coinRowX = 0;
+        let coinRowY = 0;
+        let rndX = 0;
+        let rndY = 0;
+        let coinRow = "";
+        let coinToMove = "";
+        for (let i = 0; i < playerBet.length; i++) {
+            rndX = Math.round(Math.random()*40)-(40/2);
+            rndY = Math.round(Math.random()*40)-(40/2);
+            coinRow = playerBet[i].slice(6, 12);
+            coinToMove = playerBet[i].slice(6, 15);
+            coinRowX = $(`#${coinRow}`).offset().left;
+            coinRowY = $(`#${coinRow}`).offset().top;
+            coinX = $(`#${playerBet[i]}`).offset().left;
+            coinY = $(`#${playerBet[i]}`).offset().top;
+            $(`#${coinRow}`).append(`<img id="${coinToMove}" class="coin" style="left: ${coinX-coinRowX}px; bottom: ${coinRowY-coinY}px;" src="img/${coinRow}.png">`)
+            $(`#${playerBet[i]}`).remove();
+            $(`#${coinToMove}`).animate({ left: `${30 - rndX}px`, bottom: `${0 - rndY}px`}, 500, 'swing');
+            if ( coinRow == "coin01" ) { coins01Array.push(coinToMove); coins01Qty++; }
+            else if ( coinRow == "coin05" ) { coins05Array.push(coinToMove); coins05Qty++; }
+            else if ( coinRow == "coin10" ) { coins10Array.push(coinToMove); coins10Qty++; }
+            else if ( coinRow == "coin50" ) { coins50Array.push(coinToMove); coins50Qty++; }
+        }
+        if (callback) { callback() };
+    };
+
+    function moveCoinAway(coinQty) {
+        coinQty = -coinQty;
+        console.log(`Move coin Away function`);
+        let rndX = 0;
+        let rndY = 0;
+        let coinRemoved = "";
+        let x = coinQty % 50;
+        let coins50 = ( coinQty - x ) / 50; // among of 50 coin
+        let idname = "";
+        console.log(`coinQty % 50 = ${x}`);
+        console.log(`( coinQty - x ) / 50 = ${coins50}`);
+        while ( coins50 > coins50Qty ) {
+            coins50--;
+        }
+        for ( let i = 1; i <= coins50 ; i++) {
+            coinRemoved = coins50Array.pop();
+            coins50Qty--;
+            console.log(`#${coinRemoved}`);
+            $(`#${coinRemoved}`).animate({ top: "-1000px"}, 2000, 'swing', function () { 
+                $(`#${coinRemoved}`).remove();
+            });
+        }
+        coinQty = coinQty - ( coins50 * 50);
+
+        x = coinQty % 10;
+        let coins10 = ( coinQty - x ) / 10; // among of 10 coin
+        if ( coins10 > coins10Qty && coins50Qty > 0 ) {
+            coinRemoved = coins50Array.pop();
+            coins50Qty--;
+            $(`#${coinRemoved}`).animate({ top: "-1000px"}, 2000, 'swing', function () { 
+                $(`#${coinRemoved}`).remove();
+            });
+            for (let i = 1; i < 6; i++ ) {
+                rndX = Math.round(Math.random()*40)-(40/2);
+                rndY = Math.round(Math.random()*40)-(40/2);
+                coins10Qty += 1;
+                if ( coins10Qty < 10 ) {
+                    idname = `coin10_0${coins10Qty}`;
+                } else {
+                    idname = `coin10_${coins10Qty}`;
+                }
+                coins10Array.push(idname);
+                $(`#coin10`).append(`<img id="${idname}" class="coin" style="left: 0vw; bottom: 1000px;" src="img/coin10.png">`);
+                $(`#${idname}`).animate({ left: `${30 - rndX}px`, bottom: `${0 - rndY}px`}, 500, 'swing');
+            };
+        };
+        while ( coins10 > coins10Qty ) {
+            coins10--;
+        }
+        for ( let i = 1; i <= coins10; i++) {
+            coinRemoved = coins10Array.pop();
+            coins10Qty--;
+            console.log(`#${coinRemoved}`);
+            $(`#${coinRemoved}`).animate({ top: "-1000px"}, 1000, 'swing', function () { 
+                $(`#${coinRemoved}`).remove();
+            });
+        }
+        coinQty = coinQty - ( coins10 * 10);
+
+        x = coinQty % 5;
+        let coins05 = ( coinQty - x ) / 5; // among of 5 coin
+        if ( coins05 > coins05Qty && coins10Qty > 0 ) {
+            coinRemoved = coins10Array.pop();
+            coins10Qty--;
+            $(`#${coinRemoved}`).animate({ top: "-1000px"}, 2000, 'swing', function () { 
+                $(`#${coinRemoved}`).remove();
+            });
+            for (let i = 1; i < 3; i++ ) {
+                rndX = Math.round(Math.random()*40)-(40/2);
+                rndY = Math.round(Math.random()*40)-(40/2);
+                coins05Qty += 1;
+                if ( coins05Qty < 10 ) {
+                    idname = `coin05_0${coins05Qty}`;
+                } else {
+                    idname = `coin05_${coins05Qty}`;
+                }
+                coins05Array.push(idname);
+                $(`#coin05`).append(`<img id="${idname}" class="coin" style="left: 0vw; bottom: 1000px;" src="img/coin05.png">`);
+                $(`#${idname}`).animate({ left: `${30 - rndX}px`, bottom: `${0 - rndY}px`}, 500, 'swing');
+            };
+        };
+        while ( coins05 > coins05Qty ) {
+            coins05--;
+        }
+        for ( let i = 1; i <= coins05; i++) {
+            coinRemoved = coins05Array.pop();
+            coins05Qty--;
+            console.log(`#${coinRemoved}`);
+            $(`#${coinRemoved}`).animate({ top: "-1000px"}, 1000, 'swing', function () { 
+                $(`#${coinRemoved}`).remove();
+            });
+        }
+        coinQty = coinQty - ( coins05 * 5);
+        
+        let coins01 = coinQty; // among of 1 coin
+        if ( coins01 > coins01Qty && coins05Qty > 0 ) {
+            coinRemoved = coins05Array.pop();
+            coins05Qty--;
+            $(`#${coinRemoved}`).animate({ top: "-1000px"}, 2000, 'swing', function () { 
+                $(`#${coinRemoved}`).remove();
+            });
+            for (let i = 1; i < 6; i++ ) {
+                rndX = Math.round(Math.random()*40)-(40/2);
+                rndY = Math.round(Math.random()*40)-(40/2);
+                coins01Qty += 1;
+                if ( coins01Qty < 10 ) {
+                    idname = `coin01_0${coins01Qty}`;
+                } else {
+                    idname = `coin01_${coins01Qty}`;
+                }
+                coins01Array.push(idname);
+                $(`#coin01`).append(`<img id="${idname}" class="coin" style="left: 0vw; bottom: 1000px;" src="img/coin01.png">`);
+                $(`#${idname}`).animate({ left: `${30 - rndX}px`, bottom: `${0 - rndY}px`}, 500, 'swing');
+            };
+        };
+        for ( let i = 1; i <= coins01; i++) {
+            coinRemoved = coins01Array.pop();
+            coins01Qty--;
+            console.log(`#${coinRemoved}`);
+            $(`#${coinRemoved}`).animate({ top: "-1000px"}, 1000, 'swing', function () { 
+                $(`#${coinRemoved}`).remove();
+            });
+        }
+        console.log(`$1 - ${coins01} - ${coins01Qty}`);
+        console.log(coins01Array);
+        console.log(`$5 - ${coins05} - ${coins05Qty}`);
+        console.log(coins05Array);
+        console.log(`$10 - ${coins10} - ${coins10Qty}`);
+        console.log(coins10Array);
+        console.log(`$50 - ${coins50} - ${coins50Qty}`);
+        console.log(coins50Array);
     };
 
     // Function to switch playerContent
@@ -348,7 +764,7 @@
             $('#player1AControl').css("display","none");
             $('#player1BControl').css("display","none");
             playerTurn = "dealer";
-            console.log("Mudança para o Croupie");
+            console.log("Mudança para o Croupier");
             console.log(dealerCards);
             console.log("-----------------");
         }
@@ -636,8 +1052,8 @@
         console.log(`rodando - rules ${i}`);
         console.log(`Player 1A - win: ${packs[0].winCondition} /  Pts - ${pl1point} pontos`);
         console.log(`Player 1B - win: ${packs[1].winCondition} / Pts - ${pl2point} pontos`);
-        console.log(`Croupie - win/A: ${dealerWins[0]} / Pts - ${dlPoints} pontos`);
-        console.log(`Croupie - win/B: ${dealerWins[1]} / Pts - ${dlPoints} pontos`);
+        console.log(`Croupier - win/A: ${dealerWins[0]} / Pts - ${dlPoints} pontos`);
+        console.log(`Croupier - win/B: ${dealerWins[1]} / Pts - ${dlPoints} pontos`);
         console.log(`Rodada de ${playerTurn}`)
         console.log("--------------------------------");
         return false;
@@ -656,8 +1072,8 @@
             if  ( packs[0].winCondition == true ) { 
                 // player 1A wins
                 if ( packs[0].blackjack ) {
-                    bet1A += ( packs[0].bet * 1.5 );
-                    text += `Ganhou! $${( packs[0].bet * 1.5 )}`;
+                    bet1A += (packs[0].bet * 1.5 ).toPrecision(1);
+                    text += `Ganhou! $${( packs[0].bet * 1.5 ).toFixed(0)}`;
                 } else {
                     bet1A += packs[0].bet;
                     text += `Ganhou! $${packs[0].bet}`;
@@ -673,16 +1089,16 @@
                 bet1A = 0;
             } else if ( packs[0].winCondition == "giveup" ) {
                 // player 1A giveup
-                text += `Desistiu! -$${packs[0].bet/2}`;
-                bet1A = -( packs[0].bet / 2);
+                text += `Desistiu! -$${(packs[0].bet/2).toFixed(0)}`;
+                bet1A = -(packs[0].bet / 2).toPrecision(1);
             }
         }
 
         if ( totalPlayers == 2 ) {
             if ( packs[1].winCondition == true ) {
                 if ( packs[1].blackjack ) {
-                    bet1B += ( packs[1].bet * 1.5 );
-                    text += `Mesa 1: Ganhou $${( packs[1].bet)*1.5 }`;
+                    bet1B += ( packs[1].bet * 1.5 ).toPrecision(1);
+                    text += `Mesa 1: Ganhou $${(packs[1].bet*1.5).toFixed(0) }`;
                 } else {
                     bet1B += packs[1].bet;
                     text += `Mesa 1: Ganhou $${packs[1].bet}`;
@@ -695,14 +1111,14 @@
                 text += `Mesa 1: Empatou +$0`;
                 bet1B = 0;
             } else if ( packs[1].winCondition == "giveup" ) {
-                text += `Mesa 1: Desistiu -$${packs[1].bet/2}`;
-                bet1B = -( packs[1].bet / 2);
+                text += `Mesa 1: Desistiu -$${(packs[1].bet/2).toFixed(0)}`;
+                bet1B = -( packs[1].bet / 2).toPrecision(1);
             };
             text += "<br>";
             if ( packs[0].winCondition == true) {
                 if ( packs[0].blackjack ) {
-                    bet1A += ( packs[0].bet * 1.5 );
-                    text += `Mesa 2: Ganhou! $${( packs[0].bet * 1.5 )}`;
+                    bet1A += ( packs[0].bet * 1.5 ).toPrecision(1);
+                    text += `Mesa 2: Ganhou! $${( packs[0].bet * 1.5 ).toFixed(0)}`;
                 } else {
                     bet1A += packs[0].bet;
                     text += `Mesa 2: Ganhou! $${packs[0].bet}`;
@@ -715,8 +1131,8 @@
                 text += `Mesa 2: Empatou +$0`;
                 bet1A = 0;
             } else if ( packs[0].winCondition == "giveup" ) {
-                text += `Mesa 2: Desistiu -$${packs[0].bet/2}`;
-                bet1A = -( packs[0].bet / 2);
+                text += `Mesa 2: Desistiu -$${(packs[0].bet/2).toFixed(0)}`;
+                bet1A = -(packs[0].bet / 2).toPrecision(1);
             };
         }
 
@@ -726,35 +1142,47 @@
         setTimeout( function () {
             $('h2').html(text);
             if ( packs[0].winCondition == false ) {
-                $('#bet1A').html(`$${packs[0].bet}`);
+                $('#bet1A p').html(`$${packs[0].bet}`);
+                bet1Acoins.forEach(coin => {
+                    $(`#${coin}`).animate({ top: "-1000px" }, 1000, 'swing', function () { $(`#${coin}`).remove(); } );
+                });
             } else if ( packs[0].winCondition == "giveup" ) {
-                $('#bet1A').html(`$${packs[0].bet} <span style="font-size:14px;">-$${bet1A*(-1)}</span>`);
+                $('#bet1A p').html(`$${packs[0].bet} <span style="font-size:14px;">-$${bet1A*(-1)}</span>`);
+                moveToPocket(bet1Acoins, function () { moveCoinAway(bet1A); } );
             } else {
-                $('#bet1A').html(`$${packs[0].bet} <span style="font-size:14px;">+$${bet1A}</span>`);
+                $('#bet1A p').html(`$${packs[0].bet} <span style="font-size:14px;">+$${bet1A}</span>`);
+                moveToPocket(bet1Acoins);
+                if ( bet1A > 0 ) { addCoinsQty(bet1A); };
             }
-            if ( packs[1].winCondition == false ) {
-                $('#bet1B').html(`$${packs[1].bet}`);
-            } else if ( packs[1].winCondition == "giveup" ) {
-                $('#bet1B').html(`$${packs[1].bet} <span style="font-size:14px;">-$${bet1B*(-1)}</span>`);
-            } else {
-                $('#bet1B').html(`$${packs[1].bet} <span style="font-size:14px;">+$${bet1B}</span>`);
-            }
+            if ( totalPlayers == 2 ) {
+                if ( packs[1].winCondition == false ) {
+                    $('#bet1B p').html(`$${packs[1].bet}`);
+                    bet1Bcoins.forEach(coin => {
+                        $(`#${coin}`).animate({ top: "-1000px" }, 1000, 'swing', function () { $(`#${coin}`).remove(); });
+                    });
+                } else if ( packs[1].winCondition == "giveup" ) {
+                    $('#bet1B p').html(`$${packs[1].bet} <span style="font-size:14px;">-$${bet1B*(-1)}</span>`);
+                    moveToPocket(bet1Bcoins, function () { moveCoinAway(bet1B); } );
+                } else {
+                    $('#bet1B p').html(`$${packs[1].bet} <span style="font-size:14px;">+$${bet1B}</span>`);
+                    moveToPocket(bet1Bcoins);
+                    if ( bet1B > 0 ) { addCoinsQty(bet1B); };
+                }
+            };
+            
             console.log(`Player A - $${packs[0].bet}`);
             console.log(`Player A - Winning: ${packs[0].winCondition}`);
-            console.log(`Croupie/A - Winning: ${dealerWins[0]}`);
+            console.log(`Croupier/A - Winning: ${dealerWins[0]}`);
             console.log(`Player B - $${packs[1].bet}`);
             console.log(`Player B - Winning: ${packs[1].winCondition}`);
-            console.log(`Croupie/B - Winning: ${dealerWins[1]}`);
+            console.log(`Croupier/B - Winning: ${dealerWins[1]}`);
             console.log(`bet1A - $${bet1A}`);
             console.log(`bet1B - $${bet1B}`);
             console.log(`Total Player - $${playerCoins}`);
             console.log('--------------------------');
             playerCoins += ( packs[0].bet + bet1A + packs[1].bet + bet1B );
             $('#cash').html(`$${playerCoins}`);
-            $('#start').one('click', function(event){
-                event.preventDefault();
-                playRoll(true);
-            });
+            setTimeout( playRoll , 2000, true );
         }, 300 );
         if ( packs[0].blackjack ) {
             $('#player1AScore').html(`<strong>Blackjack</strong>`);
@@ -790,22 +1218,28 @@
                 $('#btn1Asplit').css( "display", "inline-block" );
                 $('#player1AControl').css( "display", "block" );
                 $('#btn1Asplit').one('click', function () {
+                    $('#coin01').off();
+                    $('#coin05').off();
+                    $('#coin10').off();
+                    $('#coin50').off();        
                     console.log(" ////// Dividiu ///////");
                     console.log(gameControl);
                     console.log("----------------------")
                     totalPlayers = 2 ;
-                    packs[1].bet = packs[0].bet;
-                    playerCoins -= packs[1].bet;
                     $('#cash').html(`$${playerCoins}`);
                     $('#player1BContent').css( "display", "block" );
-                    $('#bet1B').css( "display", "block" );
-                    $('#bet1B').html(`$${packs[1].bet}`);
+                    $('#bet1B p').css( "display", "block" );
+                    $('#bet1B p').html(`$${packs[1].bet}`);
                     $('#btn1Asplit').css( "display", "none" );
                     getBoardsPositions();
                     //remove card from pack1
                     removedCard = cardsArray[1][1].card;
                     console.log(removedCard);
                     delete gameControl.pack1.cards.card2
+                     // add card to pack2
+                    gameControl["pack2"].cards = { 
+                                card1: { card: removedCard, reveal: true }
+                            };
                     $('#p0card2').clone().appendTo("#player1Bpack");
                     $("#player1Bpack div").attr( "id", 'p1card1');
                     $('#p1card1').css("left","0px");
@@ -813,29 +1247,112 @@
                     playBoardWidth = $('#playerboard').width();
                     $('#player1BContent').animate({ left: `${(playBoardWidth/2)-80}px` }, 500, 'swing' );
                     $('#bet1B').animate({ left: `${(playBoardWidth/2)-80}px` }, 500, 'swing' );
-                    $('#bet1A').animate({ left: `${(playBoardWidth/2)+80}px` }, 550, 'swing' );
-                    $('#player1AContent').animate({ left: `${(playBoardWidth/2)+80}px` }, 550, 'swing', getBoardsPositions );
-                    // add card to pack2
-                    gameControl["pack2"].cards = { 
-                                card1: { card: removedCard, reveal: true }
-                            };
-                    $('bet1B').html(`$${packs[1].bet}`);
-                    switchPlayer("player1B");
-                    calcScore();
-                    // Split with an "A"
-                    // just one card for each Player and turn to Dealer
-                    if ( temp1 == 1 ) {
-                        playerCardFunc(true);
-                        switchPlayer("player1A");
-                        playerCardFunc(true);
-                        switchPlayer("delaer");
-                        calcScore()
-                        setTimeout ( dealerTurnFunc(), 1000 );
-                        return
-                    }
-                    
+                    $('#bet1A').animate({ left: `${(playBoardWidth/2)+80}px` }, 500, 'swing' );
+                    $('#player1AContent').animate({ left: `${(playBoardWidth/2)+80}px` }, 550, 'swing', function () {
+                        getBoardsPositions();
+                        $('#bet1B p').html(`$${packs[1].bet}`);
+                        switchPlayer("player1B");
+                        calcScore();
+                        moveToBet(packs[0].bet, "bet1B");
+                        // Split with an "A"
+                        // just one card for each Player and turn to Dealer
+                        if ( temp1 == 1 ) {
+                            playerCardFunc(true);
+                            switchPlayer("player1A");
+                            playerCardFunc(true);
+                            switchPlayer("delaer");
+                            calcScore()
+                            setTimeout ( dealerTurnFunc(), 1000 );
+                            return
+                        }
+                     } );                    
                 });
             }
         }
+    };
+
+    function addCoinsQty(qtycoin) {
+        // Coins vars
+        let totalcoins = 0;
+        let rndX = 0;
+        let rndY = 0;
+        let rndCoin = 0;
+        let idname = "";
+        while ( totalcoins < qtycoin ) {
+            if ( (qtycoin - totalcoins) > 100 ) {
+                rndCoin = Math.round(Math.random()*3)+1;
+            } else if ( (qtycoin - totalcoins) <= 100) {
+                rndCoin = Math.round(Math.random()*2)+1;
+            } else if ( (qtycoin - totalcoins) < 30) {
+                rndCoin = Math.round(Math.random()*1)+1;
+            } else if ( (qtycoin - totalcoins) < 5) {
+                rndCoin = 1
+            }
+            rndX = Math.round(Math.random()*40)-(40/2);
+            rndY = Math.round(Math.random()*40)-(40/2);
+            switch(rndCoin) {
+                case 4:
+                    if ( ( totalcoins + 50 ) <= qtycoin ) {
+                        totalcoins += 50;
+                        coins50Qty += 1;
+                        if ( coins50Qty < 10 ) {
+                            idname = `coin50_0${coins50Qty}`;
+                        } else {
+                            idname = `coin50_${coins50Qty}`;
+                        }
+                        coins50Array.push(idname);
+                        $(`#coin50`).append(`<img id="${idname}" class="coin" style="left: 0; bottom: 1000px;" src="img/coin50.png">`);
+                        $(`#${idname}`).animate({ left: `${30 - rndX}px`, bottom: `${0 - rndY}px`}, 500, 'swing');
+                    }
+                    break;
+                case 3:
+                    if ( ( totalcoins + 10 ) <= qtycoin ) {
+                        coins10Qty += 1;
+                        totalcoins += 10;
+                        if ( coins10Qty < 10 ) {
+                            idname = `coin10_0${coins10Qty}`;
+                        } else {
+                            idname = `coin10_${coins10Qty}`;
+                        }
+                        coins10Array.push(idname);
+                        $(`#coin10`).append(`<img id="${idname}" class="coin" style="left: 0vw; bottom: 1000px;" src="img/coin10.png">`);
+                        $(`#${idname}`).animate({ left: `${30 - rndX}px`, bottom: `${0 - rndY}px`}, 500, 'swing');
+                    }
+                    break;
+            
+                case 2: 
+                    if ( ( totalcoins + 5 ) <= qtycoin ) {
+                        totalcoins += 5;
+                        coins05Qty += 1;
+                        if ( coins05Qty < 10 ) {
+                            idname = `coin05_0${coins05Qty}`;
+                        } else {
+                            idname = `coin05_${coins05Qty}`;
+                        }
+                        coins05Array.push(idname);
+                        $(`#coin05`).append(`<img id="${idname}" class="coin" style="left: 0vw; bottom: 1000px;" src="img/coin05.png">`);
+                        $(`#${idname}`).animate({ left: `${30 - rndX}px`, bottom: `${0 - rndY}px`}, 500, 'swing');
+                    }
+                    break;
+            
+                case 1: 
+                    if ( ( totalcoins + 1 ) <= qtycoin ) {
+                        totalcoins += 1;
+                        coins01Qty += 1;
+                        if ( coins01Qty < 10 ) {
+                            idname = `coin01_0${coins01Qty}`;
+                        } else {
+                            idname = `coin01_${coins01Qty}`;
+                        }
+                        coins01Array.push(idname);
+                        $(`#coin01`).append(`<img id="${idname}" class="coin" style="left: 0vw; bottom: 1000px;" src="img/coin01.png">`);
+                        $(`#${idname}`).animate({ left: `${30 - rndX}px`, bottom: `${0 - rndY}px`}, 500, 'swing');
+                    };
+                    break;
+            }
+        }
+        PlayerCoinsQty = [ totalcoins, coins01Qty, coins05Qty, coins10Qty, coins50Qty];
+        console.log(PlayerCoinsQty); 
+        console.log(`Total de moedas: ${coins01Qty + coins05Qty + coins10Qty + coins50Qty}`);
     };
 })();
