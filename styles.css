@@ -65,7 +65,7 @@ h1 {
 /* style for coins */
 #fichasbox {
     margin: auto;
-    margin-top: 10px;
+    margin-top: 20px;
     width: 120px;
     height: 20px;
     background-image: url(img/coins-total.png);
@@ -141,7 +141,36 @@ h1 {
     border-radius: 15px;
     color: #dbd400;
     border: 1px solid #dbd400;
+    animation: pulsate_msg 0.5s 3s 4 alternate; 
 }
+
+  @keyframes pulsate_msg {
+    100% {
+        box-shadow:
+        0 0 1px #fff,
+        0 0 2px #fff,
+        0 0 3px #fff,
+        0 0 4px #dbd400,
+        0 0 5px #dbd400,
+        0 0 6px #dbd400,
+        0 0 8px #dbd400,
+        0 0 10px #dbd400;
+    }
+    
+    0% { 
+        box-shadow:
+            0 0 0.5px #fff,
+            0 0 1px #fff,
+            0 0 1.5px #fff,
+            0 0 2px #dbd400,
+            0 0 2.5px #dbd400,
+            0 0 3px #dbd400,
+            0 0 4px #dbd400,
+            0 0 5px #dbd400;  
+  }
+}
+
+
 
 /* style for pocket and coins*/
 #pocket {
@@ -168,10 +197,13 @@ h1 {
     position: absolute;
     width: 35px;
     height: 35px;
-    z-index: 1;
-    animation: pulsate 0.5s infinite alternate;  
+    z-index: 1; 
     border: 0.2px solid #fff;
-    border-radius: 50%;
+    border-radius: 50%
+  }
+
+  .pulse {
+    animation: pulsate 0.5s 1s 4 alternate; 
   }
   
   @keyframes pulsate {
@@ -246,7 +278,7 @@ h1 {
 
 #dealerboard {
     margin: auto;
-    margin-top: 10px;
+    margin-top: 20px;
     border: 1px solid #ffffff;
     text-align: center;
     border-radius: 15px;
