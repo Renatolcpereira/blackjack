@@ -6,11 +6,6 @@
                      "e01","e02","e03","e04","e05","e06","e07","e08","e09","e10","e11","e12","e13", 
                      "c01","c02","c03","c04","c05","c06","c07","c08","c09","c10","c11","c12","c13", 
                      "o01","o02","o03","o04","o05","o06","o07","o08","o09","o10","o11","o12","o13"]
-                     
-    /* let allCards = ["p12","c11","p13","e01","p09","p10","p07","p08","p09","p10","p11","p12","p13", 
-                     "e01","e02","e03","e04","e05","e06","e07","e08","e09","e10","e11","e12","e13", 
-                     "c01","c02","c03","c04","c05","c06","c07","c08","c09","c10","c11","c12","c13", 
-                     "o01","o02","o03","o04","o05","o06","o07","o08","o09","o10","o11","o12","o13"] */
 
     let gameControl = {
         pack1: { player: "player1A", bet: 0, packposX: 0, packposY: 0, points1: 0, points2: 0, winCondition: null, 
@@ -205,8 +200,8 @@
                     $('#start').off();
                     getBoardsPositions();
                     dealerCardFunc(true, function () { dealerCardFunc(false); });
-                    playerCardFunc(true, function () { playerCardFunc(true);  });
-                    setTimeout( function () { checkSplit(); }, 1000); 
+                    setTimeout( playerCardFunc, 1000, true, function () { playerCardFunc(true); } );
+                    setTimeout( function () { checkSplit(); }, 2000); 
                 }
             };    
         });
@@ -239,6 +234,23 @@
                 moveToBet(50, "bet1A" );
             };          
         });
+
+        $('#bet1A').on('click', function (event) {
+            event.preventDefault();
+            console.log("clicou devolver moeda de bet1A");
+            if ( bet1Acoins > 0 ) {
+                moveToPocket( bet1Acoins, 1 );
+            };
+        })
+
+        $('#bet1B').on('click', function (event) {
+            event.preventDefault();
+            console.log("clicou devolver moeda de bet1B");
+            if ( bet1Bcoins > 0 ) {
+                moveToPocket( bet1Bcoins, 1 );
+            };
+        })
+
 
         // Player 1A - Continue Buttom
         $('#btn1Acontinue').on('click', function (event) {
@@ -575,7 +587,7 @@
         $(`#${betBoard}_${coinToMove}`).animate({ left: `${rndX}`, top: `${rndY}`}, 500, 'swing');
     }
 
-    function moveToPocket(playerBet, callback) {
+    function moveToPocket(playerBet, qtd , callback) {
         console.log("Move to pocket funcition");
         let coinX = 0;
         let coinY = 0;
@@ -585,7 +597,9 @@
         let rndY = 0;
         let coinRow = "";
         let coinToMove = "";
-        for (let i = 0; i < playerBet.length; i++) {
+        let idx = 0;
+        if ( qtd == 1 ) { idx = playerBet.length - 1; } 
+        for (let i = idx; i < playerBet.length; i++) {
             rndX = Math.round(Math.random()*40)-(40/2);
             rndY = Math.round(Math.random()*40)-(40/2);
             coinRow = playerBet[i].slice(6, 12);
@@ -1178,10 +1192,13 @@
                 });
             } else if ( packs[0].winCondition == "giveup" ) {
                 $('#bet1A p').html(`$${packs[0].bet} <span style="font-size:14px;">-$${bet1A*(-1)}</span>`);
-                moveToPocket(bet1Acoins, function () { moveCoinAway(bet1A); } );
+                moveToPocket(bet1Acoins, "all" ,function () { moveCoinAway(bet1A); } );
+            } else if ( packs[0].winCondition == "deuce" ) {
+                $('#bet1A p').html(`$${packs[0].bet}`);
+                moveToPocket(bet1Acoins, "all");
             } else {
                 $('#bet1A p').html(`$${packs[0].bet} <span style="font-size:14px;">+$${bet1A}</span>`);
-                moveToPocket(bet1Acoins, function () { if ( bet1A > 0 ) { addCoinsQty(bet1A); }; });
+                moveToPocket(bet1Acoins, "all", function () { setTimeout( addCoinsQty, 1000,  bet1A ); } );
             }
             if ( totalPlayers == 2 ) {
                 if ( packs[1].winCondition == false ) {
@@ -1191,16 +1208,22 @@
                     });
                 } else if ( packs[1].winCondition == "giveup" ) {
                     $('#bet1B p').html(`$${packs[1].bet} <span style="font-size:14px;">-$${bet1B*(-1)}</span>`);
-                    moveToPocket(bet1Bcoins, function () { moveCoinAway(bet1B); } );
+                    moveToPocket(bet1Bcoins, "all", function () { moveCoinAway(bet1B); } );
+                } else if ( packs[1].winCondition == "deuce" ) {
+                    $('#bet1B p').html(`$${packs[1].bet}`);
+                    moveToPocket(bet1Bcoins, "all");
                 } else {
                     $('#bet1B p').html(`$${packs[1].bet} <span style="font-size:14px;">+$${bet1B}</span>`);
-                    moveToPocket(bet1Bcoins, function () { if ( bet1B > 0 ) { addCoinsQty(bet1B); }; });
+                    moveToPocket(bet1Bcoins, "all", function () { setTimeout(addCoinsQty, 1000, bet1B); } );
+
                 }
             };
             
+            console.log(`Player A X: ${Math.round($('#bet1A').offset().left)} / Y: ${Math.round($('#bet1A').offset().top)}`);
             console.log(`Player A - $${packs[0].bet}`);
             console.log(`Player A - Winning: ${packs[0].winCondition}`);
             console.log(`Croupier/A - Winning: ${dealerWins[0]}`);
+            console.log(`Player B X: ${Math.round($('#bet1B').offset().left)} / Y: ${Math.round($('#bet1B').offset().top)}`);
             console.log(`Player B - $${packs[1].bet}`);
             console.log(`Player B - Winning: ${packs[1].winCondition}`);
             console.log(`Croupier/B - Winning: ${dealerWins[1]}`);
