@@ -68,7 +68,6 @@
     let coins10Array = [];
     let coins50Qty = 0; 
     let coins50Array = [];
-    let PlayerCoinsQty = [ 0, coins01Qty, coins05Qty, coins10Qty, coins50Qty];
 
     playRoll(false);
 
@@ -116,7 +115,6 @@
             dealerBlackjack = false;
             bet1Acoins = [];
             bet1Bcoins = [];
-            PlayerCoinsQty = [ 0, coins01Qty, coins05Qty, coins10Qty, coins50Qty];
             playBoardWidth = $('#playerboard').width();
             $('#player1BContent').animate({ left: `50%` }, 500, 'swing', function () {
                 $('#player1BContent').css( "display" , "none" ); 
@@ -238,10 +236,7 @@
 
         $('#bet1A').on('click', function (event) {
             event.preventDefault();
-            console.log("clicou devolver moeda de bet1A");
             if ( bet1Acoins.length > 0 ) {
-                console.log('Acionando MoveToPorcket func');
-                console.log(`bet1Acoins.length - ${bet1Acoins.length}`)
                 moveToPocket( bet1Acoins, 1 );
                 $(`#bet1A p`).html(`$${packs[0].bet}`);
                 $('#cash').html(`$${playerCoins}`);
@@ -324,7 +319,6 @@
                 $('#coin05').off();
                 $('#coin10').off();
                 $('#coin50').off();
-                console.log("Dobrando Bet1A");
                 let coinsArray = [];
                 let coinType = "";
                 doubleA = true;
@@ -346,11 +340,8 @@
         $('#btn1Bdouble').one('click', function (event) {
             event.preventDefault();
             if ( playerCoins >= packs[1].bet ) {
-                console.log("Dobrando Bet1B");
                 doubleB = true;
-
                 moveToBet(packs[1].bet, "bet1B");
-
                 $('#bet1B p').html(`$${packs[1].bet}`);
                 $('#cash').html(`$${playerCoins}`);
                 $('#btn1Bdouble').css( "display", "none" );
@@ -584,7 +575,6 @@
     }
 
     function moveToPocket(playerBet, qtd , callback) {
-        console.log("Move to pocket funcition");
         let coinX = 0;
         let coinY = 0;
         let coinRowX = 0;
@@ -614,7 +604,6 @@
             else if ( coinRow == "coin10" ) { coins10Array.push(coinToMove); coins10Qty++; coinValue = 10;}
             else if ( coinRow == "coin50" ) { coins50Array.push(coinToMove); coins50Qty++; coinValue = 50;}
         }
-        console.log(`qtd = ${qtd} && playerBet = ${betBoard}`);
         if ( qtd == 1 && betBoard == "bet1A" ) { bet1Acoins.pop(); packs[0].bet -= coinValue; playerCoins += coinValue; }
         if ( qtd == 1 && betBoard == "bet1B" ) { bet1Bcoins.pop(); packs[1].bet -= coinValue; playerCoins += coinValue; }
         if (callback) { callback() };
@@ -646,22 +635,18 @@
 
     function moveCoinAway(coinQty) {
         coinQty = -coinQty;
-        console.log(`Move coin Away function`);
         let rndX = 0;
         let rndY = 0;
         let coinRemoved = "";
         let x = coinQty % 50;
         let coins50 = ( coinQty - x ) / 50; // among of 50 coin
         let idname = "";
-        console.log(`coinQty % 50 = ${x}`);
-        console.log(`( coinQty - x ) / 50 = ${coins50}`);
         while ( coins50 > coins50Qty ) {
             coins50--;
         }
         for ( let i = 1; i <= coins50 ; i++) {
             coinRemoved = coins50Array.pop();
             coins50Qty--;
-            console.log(`#${coinRemoved}`);
             $(`#${coinRemoved}`).animate({ top: "-1000px"}, 2000, 'swing', function () { 
                 $(`#${coinRemoved}`).remove();
             });
@@ -696,7 +681,6 @@
         for ( let i = 1; i <= coins10; i++) {
             coinRemoved = coins10Array.pop();
             coins10Qty--;
-            console.log(`#${coinRemoved}`);
             $(`#${coinRemoved}`).animate({ top: "-1000px"}, 1000, 'swing', function () { 
                 $(`#${coinRemoved}`).remove();
             });
@@ -731,7 +715,6 @@
         for ( let i = 1; i <= coins05; i++) {
             coinRemoved = coins05Array.pop();
             coins05Qty--;
-            console.log(`#${coinRemoved}`);
             $(`#${coinRemoved}`).animate({ top: "-1000px"}, 1000, 'swing', function () { 
                 $(`#${coinRemoved}`).remove();
             });
@@ -762,19 +745,10 @@
         for ( let i = 1; i <= coins01; i++) {
             coinRemoved = coins01Array.pop();
             coins01Qty--;
-            console.log(`#${coinRemoved}`);
             $(`#${coinRemoved}`).animate({ top: "-1000px"}, 1000, 'swing', function () { 
                 $(`#${coinRemoved}`).remove();
             });
         }
-        console.log(`$1 - ${coins01} - ${coins01Qty}`);
-        console.log(coins01Array);
-        console.log(`$5 - ${coins05} - ${coins05Qty}`);
-        console.log(coins05Array);
-        console.log(`$10 - ${coins10} - ${coins10Qty}`);
-        console.log(coins10Array);
-        console.log(`$50 - ${coins50} - ${coins50Qty}`);
-        console.log(coins50Array);
     };
 
     // Function to switch playerContent
@@ -787,9 +761,6 @@
             if ( playerCoins >= packs[0].bet && !doubleA ) { $('#btn1Adouble').css( "display", "inline-block" ); };
             if ( packs[1].winCondition != null ) { $('#player1BContent').off(); }
             playerTurn = "player1A";
-            console.log("Mudança de player de B -> A");
-            console.log(packs[0].cards);
-            console.log("-----------------");
         } 
         if ( totalPlayers == 2 && player == "player1B" && !player1BPass ) {
             $('#player1BContent').css("background-color", "#337207");
@@ -798,10 +769,7 @@
             $('#player1AControl').css("display","none");
             if ( playerCoins >= packs[1].bet && !doubleB ) { $('#btn1Bdouble').css( "display", "inline-block" ); };
             if ( packs[0].winCondition != null ) { $('#player1AContent').off(); }
-            playerTurn = "player1B";
-            console.log("Mudança de player de A -> B");
-            console.log(packs[1].cards);
-            console.log("-----------------");          
+            playerTurn = "player1B";        
         }
         if ( player == "dealer") {
             $('#player1BContent').css("background-color", "#transparent");
@@ -809,9 +777,6 @@
             $('#player1AControl').css("display","none");
             $('#player1BControl').css("display","none");
             playerTurn = "dealer";
-            console.log("Mudança para o Croupier");
-            console.log(dealerCards);
-            console.log("-----------------");
         }
     };
 
@@ -825,10 +790,6 @@
         dealerCardPosY = Math.round($('#dealerpack').offset().top);
         cardsPosX = Math.round($('#playcardsboard').offset().left);
         cardsPosY = Math.round($('#playcardsboard').offset().top) + 7;
-        console.log(`Player1A X - ${packs[0].packposX} / Y - ${packs[0].packposY}`);
-        console.log(`Player1B X - ${packs[1].packposX} / Y - ${packs[1].packposY}`);
-        console.log(`Dealer X - ${dealerCardPosX} / Y - ${dealerCardPosY}`);
-        console.log("----------------------------")
     };
 
     // Function shuffle cards
@@ -859,14 +820,9 @@
         removedCard = allCards.shift();
         for (let i = 0; i < totalPlayers ; i++) {
             if ( packs[i].player === playerTurn ){
-                console.log(`+ Carta para ${packs[i].player} - ${removedCard}`);
-                console.log(`Total Players: ${totalPlayers}`);
                 cardsArray = Object.entries(packs[i].cards);
-                console.log(cardsArray);
                 plTotalCards = cardsArray.length;
-                console.log(`Total cartas atual: ${plTotalCards}`);
                 plTotalCards++;
-                console.log(`Próxima carta: p${i}card${plTotalCards}`);
                 packs[i].cards[`card${plTotalCards}`] = { card: removedCard, reveal: reveal };
                 $(`#${packs[i].player}pack`).append(`<div id="p${i}card${plTotalCards}" style="left: ${cardsPosX-packs[i].packposX}px; top: ${cardsPosY-packs[i].packposY}px;"><img src="img/back-blue.jpg"></div>`);
                 cardMove(`p${i}card${plTotalCards}`, removedCard, (plTotalCards-1)*15, 0, reveal, callback );
@@ -877,8 +833,6 @@
     // Function to move and reveal cards
     function cardMove(card, rmvCard, posX, posY, reveal, callback) {
         $(`#${card}`).animate({ left: `${posX}px`, top: `${posY}px`}, 500, 'swing' , function () {
-            console.log(`Movendo a carta: ${card} - ${rmvCard}`)
-            console.log("---------------");
             if (reveal) { $(`#${card}`).html(`<img src="img/${rmvCard}.jpg">`) };
             calcScore();
             if (callback) { callback() };
@@ -888,7 +842,6 @@
     // Function to add one card to dealer
     function dealerTurnFunc() {
         switchPlayer("dealer");
-        console.log("******* Looping do Dealer **********");
         endGameVar = false;
 
         dealerCards.card2.reveal = true;
@@ -908,23 +861,19 @@
                         if ( t == 5) {console.log("limite de cartas atingido"); console.log("FFFIIIMMMM por limite"); };
                     } else {
                         clearInterval(cicle);
-                        console.log("FFFFFFFIIIIIIIMMMMMMM");
                         endGame();
                     }
                 }, 1200);
             } else {
-                console.log("FFFFFFFIIIIIIIMMMMMMM");
                 endGame();
             } 
         } else {
-            console.log("FFFFFFFIIIIIIIMMMMMMM");
             endGame();
         }   
     };
 
     // Function to calc score
     function calcScore () {
-        console.log("----- Calculando Score -------");
         let temp = 0;
         let cardsArray = Object.entries(packs[0].cards);
 
@@ -1094,23 +1043,12 @@
             if ( plPoints == 21) { packs[i].winCondition = true; return true; }
             if ( plPoints > 21 ) { packs[i].winCondition = false; return true; }
         }
-        console.log(`rodando - rules ${i}`);
-        console.log(`Player 1A - win: ${packs[0].winCondition} /  Pts - ${pl1point} pontos`);
-        console.log(`Player 1B - win: ${packs[1].winCondition} / Pts - ${pl2point} pontos`);
-        console.log(`Croupier - win/A: ${dealerWins[0]} / Pts - ${dlPoints} pontos`);
-        console.log(`Croupier - win/B: ${dealerWins[1]} / Pts - ${dlPoints} pontos`);
-        console.log(`Rodada de ${playerTurn}`)
-        console.log("--------------------------------");
         return false;
     }
 
     // Function to announce end game
     function endGame () {  
-        console.log("rodando Endgame");
         let text = `<a href="#" id="start">`;
-        console.log(`BlackJack 1A: ${packs[0].blackjack}`);
-        console.log(`BlackJack 1B: ${packs[1].blackjack}`);
-        console.log(`BlackJack Dealer: ${dealerBlackjack}`);
         bet1A = 0;
         bet1B = 0;
         if ( totalPlayers == 1 ) {
@@ -1219,21 +1157,7 @@
 
                 }
             };
-            
-            console.log(`Player A X: ${Math.round($('#bet1A').offset().left)} / Y: ${Math.round($('#bet1A').offset().top)}`);
-            console.log(`Player A - $${packs[0].bet}`);
-            console.log(`Player A - Winning: ${packs[0].winCondition}`);
-            console.log(`Croupier/A - Winning: ${dealerWins[0]}`);
-            console.log(`Player B X: ${Math.round($('#bet1B').offset().left)} / Y: ${Math.round($('#bet1B').offset().top)}`);
-            console.log(`Player B - $${packs[1].bet}`);
-            console.log(`Player B - Winning: ${packs[1].winCondition}`);
-            console.log(`Croupier/B - Winning: ${dealerWins[1]}`);
-            console.log(`bet1A - $${bet1A}`);
-            console.log(`bet1B - $${bet1B}`);
-            console.log(`Total Player - $${playerCoins}`);
-            console.log('--------------------------');
             playerCoins += ( packs[0].bet + bet1A + packs[1].bet + bet1B );
-            console.log(`Total Player - $${playerCoins}`);
             $('#cash').html(`$${playerCoins}`);
 
             $('#start').on('click', function (event) {
@@ -1280,9 +1204,6 @@
                     $('#coin05').off();
                     $('#coin10').off();
                     $('#coin50').off();        
-                    console.log(" ////// Dividiu ///////");
-                    console.log(gameControl);
-                    console.log("----------------------")
                     totalPlayers = 2 ;
                     $('#cash').html(`$${playerCoins}`);
                     $('#player1BContent').css( "display", "block" );
@@ -1293,7 +1214,6 @@
                     getBoardsPositions();
                     //remove card from pack1
                     removedCard = cardsArray[1][1].card;
-                    console.log(removedCard);
                     delete gameControl.pack1.cards.card2
                      // add card to pack2
                     gameControl["pack2"].cards = { 
@@ -1419,8 +1339,5 @@
             }
         }
         totalcoins = coins01Qty + coins05Qty * 5 + coins10Qty * 10 + coins50Qty * 50;
-        PlayerCoinsQty = [ totalcoins, coins01Qty, coins05Qty, coins10Qty, coins50Qty];
-        console.log(PlayerCoinsQty); 
-        console.log(`Total de moedas: ${coins01Qty + coins05Qty + coins10Qty + coins50Qty}`);
     };
 })();
