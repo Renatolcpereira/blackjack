@@ -591,7 +591,7 @@
             rndX = Math.round(Math.random()*40)-(40/2);
             rndY = Math.round(Math.random()*40)-(40/2);
             coinRow = playerBet[i].slice(6, 12);
-            coinToMove = playerBet[i].slice(6, 15);
+            coinToMove = playerBet[i].slice(6, playerBet[i].length);
             coinRowX = $(`#${coinRow}`).offset().left;
             coinRowY = $(`#${coinRow}`).offset().top;
             coinX = $(`#${playerBet[i]}`).offset().left;
